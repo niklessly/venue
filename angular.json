@@ -1,39 +1,35 @@
 {
-    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-    "version": 1,
-    "projects": {
-        "venue-booking-app": {
-            "projectType": "application",
-            "root": "",
-            "sourceRoot": "src",
-            "prefix": "app",
-            "architect": {
-                "build": {
-                    "builder": "@angular/build:application",
-                    "options": {
-                        "outputPath": "dist/venue-booking-app",
-                        "index": "src/index.html",
-                        "browser": "src/main.ts",
-                        "polyfills": [
-                            "zone.js"
-                        ],
-                        "tsConfig": "tsconfig.app.json",
-                        "assets": [],
-                        "styles": [
-                            "src/styles.css"
-                        ]
-                    }
-                },
-                "serve": {
-                    "builder": "@angular/build:dev-server",
-                    "options": {
-                        "buildTarget": "venue-booking-app:build"
-                    }
-                }
-            }
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "projects": {
+    "venue-booking-app": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/venue-booking-app",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": ["zone.js"],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [],
+            "styles": ["src/styles.css"]
+          }
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "venue-booking-app:build"
+          }
         }
-    },
-    "cli": {
-      "analytics": false
+      }
     }
+  },
+  "cli": {
+    "analytics": false
+  }
 }

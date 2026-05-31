@@ -4,9 +4,9 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AppStateService } from '../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
-    template: `
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  template: `
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">venue</div>
@@ -37,31 +37,31 @@ import { AppStateService } from '../core/app-state.service';
   `,
 })
 export class MainShellComponent {
-    private readonly state = inject(AppStateService);
-    private readonly router = inject(Router);
+  private readonly state = inject(AppStateService);
+  private readonly router = inject(Router);
 
-    readonly userName = computed(() => this.state.user()?.name ?? 'guest');
-    readonly isAdmin = computed(() => this.state.user()?.role === 'admin');
+  readonly userName = computed(() => this.state.user()?.name ?? 'guest');
+  readonly isAdmin = computed(() => this.state.user()?.role === 'admin');
 
-    get title(): string {
-        const url = this.router.url;
-        if (url.includes('/statistics')) {
-            return 'statistics';
-        }
-        if (url.includes('/room-details')) {
-            return 'room details';
-        }
-        if (url.includes('/bookings')) {
-            return 'my bookings';
-        }
-        if (url.includes('/admin')) {
-            return 'admin panel';
-        }
-        return 'available rooms';
+  get title(): string {
+    const url = this.router.url;
+    if (url.includes('/statistics')) {
+      return 'statistics';
     }
-
-    logout(): void {
-        this.state.logout();
-        void this.router.navigate(['/auth/login']);
+    if (url.includes('/room-details')) {
+      return 'room details';
     }
+    if (url.includes('/bookings')) {
+      return 'my bookings';
+    }
+    if (url.includes('/admin')) {
+      return 'admin panel';
+    }
+    return 'available rooms';
+  }
+
+  logout(): void {
+    this.state.logout();
+    void this.router.navigate(['/auth/login']);
+  }
 }

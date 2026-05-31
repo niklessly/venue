@@ -46,12 +46,22 @@ import { AppStateService } from '../../core/app-state.service';
 
             <div class="field">
               <label for="email">email</label>
-              <input id="email" type="email" formControlName="email" placeholder="mila@venue.local" />
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="mila@venue.local"
+              />
             </div>
 
             <div class="field">
               <label for="password">password</label>
-              <input id="password" type="password" formControlName="password" placeholder="••••••••" />
+              <input
+                id="password"
+                type="password"
+                formControlName="password"
+                placeholder="••••••••"
+              />
             </div>
 
             <button class="btn" type="submit" [disabled]="form.invalid">enter dashboard</button>

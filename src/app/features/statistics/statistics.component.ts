@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
@@ -36,8 +36,13 @@ import { AppStateService } from '../../core/app-state.service';
                 <strong>{{ room.name }}</strong>
                 <span>{{ usage(room.id) }} bookings</span>
               </div>
-              <div style="height: 12px; background: rgba(0, 0, 0, 0.06); border-radius: 999px; overflow: hidden;">
-                <div [style.width.%]="bar(room.id)" style="height: 100%; background: var(--accent-yellow);"></div>
+              <div
+                style="height: 12px; background: rgba(0, 0, 0, 0.06); border-radius: 999px; overflow: hidden;"
+              >
+                <div
+                  [style.width.%]="bar(room.id)"
+                  style="height: 100%; background: var(--accent-yellow);"
+                ></div>
               </div>
             </div>
           </div>
@@ -68,7 +73,9 @@ export class StatisticsComponent {
   readonly stats = this.state.statistics;
 
   usage(roomId: string): number {
-    return this.state.bookings().filter((booking) => booking.roomId === roomId && booking.status === 'active').length;
+    return this.state
+      .bookings()
+      .filter((booking) => booking.roomId === roomId && booking.status === 'active').length;
   }
 
   bar(roomId: string): number {

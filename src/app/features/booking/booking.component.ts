@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -58,7 +58,11 @@ import { AppStateService } from '../../core/app-state.service';
               <p class="eyebrow">required equipment</p>
               <div class="checkbox-list">
                 <label *ngFor="let item of equipmentOptions">
-                  <input type="checkbox" [checked]="selectedEquipment.has(item)" (change)="toggleEquipment(item, $event)" />
+                  <input
+                    type="checkbox"
+                    [checked]="selectedEquipment.has(item)"
+                    (change)="toggleEquipment(item, $event)"
+                  />
                   <span>{{ item }}</span>
                 </label>
               </div>
@@ -81,7 +85,10 @@ export class BookingComponent {
   private readonly router = inject(Router);
 
   readonly rooms = this.state.rooms;
-  readonly roomIdFromRoute = this.route.snapshot.queryParamMap.get('roomId') ?? this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
+  readonly roomIdFromRoute =
+    this.route.snapshot.queryParamMap.get('roomId') ??
+    this.route.snapshot.paramMap.get('id') ??
+    this.state.selectedRoomId();
   selectedEquipment = new Set<string>();
   error = '';
 

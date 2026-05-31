@@ -38,7 +38,9 @@ import { AppStateService } from '../../core/app-state.service';
         </div>
       </form>
 
-      <div style="display:flex; justify-content:space-between; gap: 12px; align-items:center; margin-top: 18px;">
+      <div
+        style="display:flex; justify-content:space-between; gap: 12px; align-items:center; margin-top: 18px;"
+      >
         <div>
           <p class="eyebrow">available rooms</p>
           <h2 style="margin:0;">choose the room that fits your meeting</h2>
@@ -47,7 +49,12 @@ import { AppStateService } from '../../core/app-state.service';
       </div>
 
       <div class="rooms-grid" *ngIf="rooms().length; else emptyRooms">
-        <button class="room-card" *ngFor="let room of rooms()" type="button" (click)="openRoom(room.id)">
+        <button
+          class="room-card"
+          *ngFor="let room of rooms()"
+          type="button"
+          (click)="openRoom(room.id)"
+        >
           <div class="room-name">{{ room.name }}</div>
           <div class="room-meta">
             <span>{{ room.capacity }} seats</span>

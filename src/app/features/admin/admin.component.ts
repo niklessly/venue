@@ -4,16 +4,20 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
-    template: `
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  template: `
     <section class="split-layout">
       <div class="card stack">
         <div>
           <p class="eyebrow">edit room</p>
           <div class="field">
             <label for="roomId">room</label>
-            <select id="roomId" [value]="selectedRoomId" (change)="pickRoom($any($event.target).value)">
+            <select
+              id="roomId"
+              [value]="selectedRoomId"
+              (change)="pickRoom($any($event.target).value)"
+            >
               <option *ngFor="let room of rooms()" [value]="room.id">{{ room.name }}</option>
             </select>
           </div>
@@ -60,55 +64,55 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class AdminComponent {
-    private readonly state = inject(AppStateService);
-    private readonly fb = inject(FormBuilder);
+  private readonly state = inject(AppStateService);
+  private readonly fb = inject(FormBuilder);
 
-    readonly rooms = this.state.rooms;
-    selectedRoomId = this.rooms()[0]?.id ?? 'room-1';
+  readonly rooms = this.state.rooms;
+  selectedRoomId = this.rooms()[0]?.id ?? 'room-1';
 
-    readonly form = this.fb.nonNullable.group({
-        name: [''],
-        capacity: [4],
-        location: [''],
-        description: [''],
-        equipment: [''],
+  readonly form = this.fb.nonNullable.group({
+    name: [''],
+    capacity: [4],
+    location: [''],
+    description: [''],
+    equipment: [''],
+  });
+
+  constructor() {
+    this.loadRoom(this.selectedRoomId);
+  }
+
+  pickRoom(roomId: string): void {
+    this.selectedRoomId = roomId;
+    this.loadRoom(roomId);
+  }
+
+  save(): void {
+    const value = this.form.getRawValue();
+    this.state.updateRoom(this.selectedRoomId, {
+      name: value.name,
+      capacity: Number(value.capacity),
+      location: value.location,
+      description: value.description,
+      equipment: value.equipment
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
     });
+  }
 
-    constructor() {
-        this.loadRoom(this.selectedRoomId);
+  private loadRoom(roomId: string): void {
+    const room = this.state.roomById(roomId);
+    if (!room) {
+      return;
     }
 
-    pickRoom(roomId: string): void {
-        this.selectedRoomId = roomId;
-        this.loadRoom(roomId);
-    }
-
-    save(): void {
-        const value = this.form.getRawValue();
-        this.state.updateRoom(this.selectedRoomId, {
-            name: value.name,
-            capacity: Number(value.capacity),
-            location: value.location,
-            description: value.description,
-            equipment: value.equipment
-                .split(',')
-                .map((item) => item.trim())
-                .filter(Boolean),
-        });
-    }
-
-    private loadRoom(roomId: string): void {
-        const room = this.state.roomById(roomId);
-        if (!room) {
-            return;
-        }
-
-        this.form.setValue({
-            name: room.name,
-            capacity: room.capacity,
-            location: room.location,
-            description: room.description,
-            equipment: room.equipment.join(', '),
-        });
-    }
+    this.form.setValue({
+      name: room.name,
+      capacity: room.capacity,
+      location: room.location,
+      description: room.description,
+      equipment: room.equipment.join(', '),
+    });
+  }
 }
