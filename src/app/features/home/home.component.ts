@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
-    template: `
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <section class="panel">
       <form class="filter-strip" [formGroup]="form">
         <div class="field">
@@ -62,36 +63,36 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class HomeComponent {
-    private readonly fb = inject(FormBuilder);
-    private readonly state = inject(AppStateService);
-    private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly state = inject(AppStateService);
+  private readonly router = inject(Router);
 
-    readonly rooms = this.state.filteredRooms;
+  readonly rooms = this.state.filteredRooms;
 
-    readonly form = this.fb.nonNullable.group({
-        date: [''],
-        time: [''],
-        capacity: [0],
-        equipment: [''],
-        sortBy: ['name' as const],
+  readonly form = this.fb.nonNullable.group({
+    date: [''],
+    time: [''],
+    capacity: [0],
+    equipment: [''],
+    sortBy: ['name' as const],
+  });
+
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
+      this.state.setFilters({
+        date: value.date ?? '',
+        time: value.time ?? '',
+        capacity: value.capacity ? Number(value.capacity) : null,
+        equipment: value.equipment ?? '',
+        sortBy: value.sortBy ?? 'name',
+      });
     });
 
-    constructor() {
-        this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
-            this.state.setFilters({
-                date: value.date ?? '',
-                time: value.time ?? '',
-                capacity: value.capacity ? Number(value.capacity) : null,
-                equipment: value.equipment ?? '',
-                sortBy: value.sortBy ?? 'name',
-            });
-        });
+    this.state.setFilters(this.form.getRawValue());
+  }
 
-        this.state.setFilters(this.form.getRawValue());
-    }
-
-    openRoom(roomId: string): void {
-        this.state.selectRoom(roomId);
-        void this.router.navigate(['/room-details', roomId]);
-    }
+  openRoom(roomId: string): void {
+    this.state.selectRoom(roomId);
+    void this.router.navigate(['/room-details', roomId]);
+  }
 }

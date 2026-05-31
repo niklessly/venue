@@ -28,6 +28,9 @@ body {
     font-family: "Aptos", "Trebuchet MS", "Segoe UI", sans-serif;
 }
 
+/* Taiga UI base styles (requires installing @taiga-ui packages) */
+@import "@taiga-ui/core/styles/taiga-ui.min.css";
+
 * {
     box-sizing: border-box;
 }

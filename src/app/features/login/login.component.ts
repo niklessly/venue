@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
-    template: `
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <section class="auth-layout">
       <aside class="auth-visual">
         <div>
@@ -61,23 +62,23 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class LoginComponent {
-    private readonly fb = inject(FormBuilder);
-    private readonly state = inject(AppStateService);
-    private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly state = inject(AppStateService);
+  private readonly router = inject(Router);
 
-    readonly form = this.fb.nonNullable.group({
-        name: ['Mila Ivanova', Validators.required],
-        email: ['mila@venue.local', [Validators.required, Validators.email]],
-        password: ['demo-password', Validators.required],
-    });
+  readonly form = this.fb.nonNullable.group({
+    name: ['Mila Ivanova', Validators.required],
+    email: ['mila@venue.local', [Validators.required, Validators.email]],
+    password: ['demo-password', Validators.required],
+  });
 
-    submit(): void {
-        if (this.form.invalid) {
-            return;
-        }
-
-        const value = this.form.getRawValue();
-        this.state.login(value.email, value.name || value.email.split('@')[0]);
-        void this.router.navigate(['/rooms']);
+  submit(): void {
+    if (this.form.invalid) {
+      return;
     }
+
+    const value = this.form.getRawValue();
+    this.state.login(value.email, value.name || value.email.split('@')[0]);
+    void this.router.navigate(['/rooms']);
+  }
 }

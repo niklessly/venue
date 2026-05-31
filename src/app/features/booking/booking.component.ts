@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
-    template: `
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <section class="dialog-overlay">
       <div class="dialog-card">
         <div class="dialog-grid">
@@ -74,87 +75,87 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class BookingComponent {
-    private readonly fb = inject(FormBuilder);
-    private readonly state = inject(AppStateService);
-    private readonly route = inject(ActivatedRoute);
-    private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly state = inject(AppStateService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-    readonly rooms = this.state.rooms;
-    readonly roomIdFromRoute = this.route.snapshot.queryParamMap.get('roomId') ?? this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
-    selectedEquipment = new Set<string>();
-    error = '';
+  readonly rooms = this.state.rooms;
+  readonly roomIdFromRoute = this.route.snapshot.queryParamMap.get('roomId') ?? this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
+  selectedEquipment = new Set<string>();
+  error = '';
 
-    readonly form = this.fb.nonNullable.group({
-        roomId: [this.roomIdFromRoute],
-        title: [''],
-        date: ['2026-05-05', Validators.required],
-        startTime: ['10:00', Validators.required],
-        endTime: ['10:45', Validators.required],
-        participants: [4, [Validators.required, Validators.min(1)]],
+  readonly form = this.fb.nonNullable.group({
+    roomId: [this.roomIdFromRoute],
+    title: [''],
+    date: ['2026-05-05', Validators.required],
+    startTime: ['10:00', Validators.required],
+    endTime: ['10:45', Validators.required],
+    participants: [4, [Validators.required, Validators.min(1)]],
+  });
+
+  get room() {
+    return this.state.roomById(this.form.getRawValue().roomId) ?? this.state.selectedRoom();
+  }
+
+  constructor() {
+    const room = this.state.roomById(this.roomIdFromRoute) ?? this.state.selectedRoom();
+    if (room) {
+      this.state.selectRoom(room.id);
+      this.selectedEquipment = new Set(room.equipment);
+    }
+
+    this.form.controls.roomId.valueChanges.pipe(takeUntilDestroyed()).subscribe((roomId) => {
+      const selected = this.state.roomById(roomId);
+      if (selected) {
+        this.state.selectRoom(selected.id);
+        this.selectedEquipment = new Set(selected.equipment);
+      }
+    });
+  }
+
+  get equipmentOptions(): string[] {
+    const room = this.state.roomById(this.form.getRawValue().roomId) ?? this.state.selectedRoom();
+    return room?.equipment ?? [];
+  }
+
+  toggleEquipment(item: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.selectedEquipment.add(item);
+    } else {
+      this.selectedEquipment.delete(item);
+    }
+    this.selectedEquipment = new Set(this.selectedEquipment);
+  }
+
+  close(): void {
+    void this.router.navigate(['/room-details', this.form.getRawValue().roomId]);
+  }
+
+  submit(): void {
+    if (this.form.invalid) {
+      this.error = 'please fill all required fields';
+      return;
+    }
+
+    const value = this.form.getRawValue();
+    const booking = this.state.createBooking({
+      roomId: value.roomId,
+      title: value.title,
+      date: value.date,
+      startTime: value.startTime,
+      endTime: value.endTime,
+      participants: Number(value.participants),
+      equipment: [...this.selectedEquipment],
     });
 
-    get room() {
-        return this.state.roomById(this.form.getRawValue().roomId) ?? this.state.selectedRoom();
+    if (!booking) {
+      this.error = 'the room capacity is smaller than the selected group size';
+      return;
     }
 
-    constructor() {
-        const room = this.state.roomById(this.roomIdFromRoute) ?? this.state.selectedRoom();
-        if (room) {
-            this.state.selectRoom(room.id);
-            this.selectedEquipment = new Set(room.equipment);
-        }
-
-        this.form.controls.roomId.valueChanges.pipe(takeUntilDestroyed()).subscribe((roomId) => {
-            const selected = this.state.roomById(roomId);
-            if (selected) {
-                this.state.selectRoom(selected.id);
-                this.selectedEquipment = new Set(selected.equipment);
-            }
-        });
-    }
-
-    get equipmentOptions(): string[] {
-        const room = this.state.roomById(this.form.getRawValue().roomId) ?? this.state.selectedRoom();
-        return room?.equipment ?? [];
-    }
-
-    toggleEquipment(item: string, event: Event): void {
-        const checked = (event.target as HTMLInputElement).checked;
-        if (checked) {
-            this.selectedEquipment.add(item);
-        } else {
-            this.selectedEquipment.delete(item);
-        }
-        this.selectedEquipment = new Set(this.selectedEquipment);
-    }
-
-    close(): void {
-        void this.router.navigate(['/room-details', this.form.getRawValue().roomId]);
-    }
-
-    submit(): void {
-        if (this.form.invalid) {
-            this.error = 'please fill all required fields';
-            return;
-        }
-
-        const value = this.form.getRawValue();
-        const booking = this.state.createBooking({
-            roomId: value.roomId,
-            title: value.title,
-            date: value.date,
-            startTime: value.startTime,
-            endTime: value.endTime,
-            participants: Number(value.participants),
-            equipment: [...this.selectedEquipment],
-        });
-
-        if (!booking) {
-            this.error = 'the room capacity is smaller than the selected group size';
-            return;
-        }
-
-        this.error = '';
-        void this.router.navigate(['/bookings']);
-    }
+    this.error = '';
+    void this.router.navigate(['/bookings']);
+  }
 }

@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, RouterLink],
-    template: `
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <section class="stack">
       <div class="summary-grid">
         <div class="summary-card">
@@ -55,28 +56,28 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class BookingsComponent {
-    private readonly state = inject(AppStateService);
+  private readonly state = inject(AppStateService);
 
-    readonly bookings = this.state.currentUserBookings;
+  readonly bookings = this.state.currentUserBookings;
 
-    distinctRooms(): number {
-        return new Set(this.bookings().map((booking) => booking.roomId)).size;
-    }
+  distinctRooms(): number {
+    return new Set(this.bookings().map((booking) => booking.roomId)).size;
+  }
 
-    cancelledCount(): number {
-        return this.state.bookings().filter((booking) => booking.status === 'cancelled').length;
-    }
+  cancelledCount(): number {
+    return this.state.bookings().filter((booking) => booking.status === 'cancelled').length;
+  }
 
-    todayCount(): number {
-        const today = new Date().toISOString().slice(0, 10);
-        return this.bookings().filter((booking) => booking.date === today).length;
-    }
+  todayCount(): number {
+    const today = new Date().toISOString().slice(0, 10);
+    return this.bookings().filter((booking) => booking.date === today).length;
+  }
 
-    roomName(roomId: string): string {
-        return this.state.roomById(roomId)?.name ?? 'room';
-    }
+  roomName(roomId: string): string {
+    return this.state.roomById(roomId)?.name ?? 'room';
+  }
 
-    cancel(bookingId: string): void {
-        this.state.cancelBooking(bookingId);
-    }
+  cancel(bookingId: string): void {
+    this.state.cancelBooking(bookingId);
+  }
 }

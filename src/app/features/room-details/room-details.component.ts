@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  standalone: true,
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <section class="split-layout">
       <article class="card stack">
         <div class="room-hero">{{ room?.name ?? 'room' }}</div>
@@ -42,25 +43,25 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class RoomDetailsComponent {
-    private readonly state = inject(AppStateService);
-    private readonly route = inject(ActivatedRoute);
-    private readonly router = inject(Router);
+  private readonly state = inject(AppStateService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-    readonly roomId = this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
-    readonly room = this.state.roomById(this.roomId) ?? this.state.selectedRoom();
+  readonly roomId = this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
+  readonly room = this.state.roomById(this.roomId) ?? this.state.selectedRoom();
 
-    constructor() {
-        if (this.room) {
-            this.state.selectRoom(this.room.id);
-        }
+  constructor() {
+    if (this.room) {
+      this.state.selectRoom(this.room.id);
+    }
+  }
+
+  book(): void {
+    if (!this.room) {
+      return;
     }
 
-    book(): void {
-        if (!this.room) {
-            return;
-        }
-
-        this.state.selectRoom(this.room.id);
-        void this.router.navigate(['/page'], { queryParams: { roomId: this.room.id } });
-    }
+    this.state.selectRoom(this.room.id);
+    void this.router.navigate(['/page'], { queryParams: { roomId: this.room.id } });
+  }
 }

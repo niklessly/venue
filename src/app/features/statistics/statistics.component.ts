@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  standalone: true,
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <section class="stack">
       <div class="summary-grid">
         <div class="summary-card">
@@ -61,17 +62,17 @@ import { AppStateService } from '../../core/app-state.service';
   `,
 })
 export class StatisticsComponent {
-    private readonly state = inject(AppStateService);
+  private readonly state = inject(AppStateService);
 
-    readonly rooms = this.state.rooms;
-    readonly stats = this.state.statistics;
+  readonly rooms = this.state.rooms;
+  readonly stats = this.state.statistics;
 
-    usage(roomId: string): number {
-        return this.state.bookings().filter((booking) => booking.roomId === roomId && booking.status === 'active').length;
-    }
+  usage(roomId: string): number {
+    return this.state.bookings().filter((booking) => booking.roomId === roomId && booking.status === 'active').length;
+  }
 
-    bar(roomId: string): number {
-        const max = Math.max(...this.rooms().map((room) => this.usage(room.id)), 1);
-        return Math.round((this.usage(roomId) / max) * 100);
-    }
+  bar(roomId: string): number {
+    const max = Math.max(...this.rooms().map((room) => this.usage(room.id)), 1);
+    return Math.round((this.usage(roomId) / max) * 100);
+  }
 }

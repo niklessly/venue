@@ -12,7 +12,10 @@
             "ES2022",
             "DOM"
         ],
-        "types": [],
+        "types": [
+            "jest"
+        ],
+        "esModuleInterop": true,
         "skipLibCheck": true,
         "noImplicitOverride": true,
         "noPropertyAccessFromIndexSignature": true,
