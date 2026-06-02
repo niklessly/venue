@@ -10,6 +10,7 @@
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint . --ext .ts",
     "lint:css": "stylelint \"src/**/*.css\"",
+    "mock-api": "json-server --watch mock-api/db.json --port 3000",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "@types/jest": "^29.5.3",
     "jest-environment-jsdom": "^29.6.1",
     "@playwright/test": "^1.36.0",
+    "json-server": "^0.17.3",
     "eslint": "^8.48.0",
     "@typescript-eslint/parser": "^6.9.0",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
