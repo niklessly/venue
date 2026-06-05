@@ -3,11 +3,13 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TuiButton, TuiNotification } from '@taiga-ui/core';
 import { AppStateService } from '../../core/app-state.service';
+import { Recurrence } from '../../models';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TuiButton, TuiNotification],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="dialog-overlay">
@@ -15,17 +17,21 @@ import { AppStateService } from '../../core/app-state.service';
         <div class="dialog-grid">
           <div style="display:flex; justify-content:space-between; gap: 12px; align-items:start;">
             <div>
-              <p class="eyebrow">create booking</p>
+              <p class="eyebrow">{{ isEditing ? 'edit booking' : 'create booking' }}</p>
               <h2 style="margin: 0;">{{ room?.name ?? 'choose room' }}</h2>
             </div>
-            <button class="btn-ghost" type="button" (click)="close()">x</button>
+            <button tuiButton size="s" appearance="secondary" type="button" (click)="close()">
+              close
+            </button>
           </div>
 
           <form class="dialog-grid" [formGroup]="form" (ngSubmit)="submit()">
             <div class="field">
               <label for="roomId">room</label>
               <select id="roomId" formControlName="roomId">
-                <option *ngFor="let item of rooms()" [value]="item.id">{{ item.name }}</option>
+                <option *ngFor="let item of rooms(); trackBy: trackByRoomId" [value]="item.id">
+                  {{ item.name }}
+                </option>
               </select>
             </div>
 
@@ -34,7 +40,7 @@ import { AppStateService } from '../../core/app-state.service';
               <input id="title" formControlName="title" placeholder="team sync" />
             </div>
 
-            <div style="display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+            <div class="time-grid">
               <div class="field">
                 <label for="date">date</label>
                 <input id="date" type="date" formControlName="date" />
@@ -54,10 +60,31 @@ import { AppStateService } from '../../core/app-state.service';
               <input id="participants" type="number" min="1" formControlName="participants" />
             </div>
 
+            <div class="time-grid" *ngIf="!isEditing">
+              <div class="field">
+                <label for="recurrence">repeat</label>
+                <select id="recurrence" formControlName="recurrence">
+                  <option value="none">none</option>
+                  <option value="daily">daily</option>
+                  <option value="weekly">weekly</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="occurrences">occurrences</label>
+                <input
+                  id="occurrences"
+                  type="number"
+                  min="1"
+                  max="12"
+                  formControlName="occurrences"
+                />
+              </div>
+            </div>
+
             <div>
               <p class="eyebrow">required equipment</p>
               <div class="checkbox-list">
-                <label *ngFor="let item of equipmentOptions">
+                <label *ngFor="let item of equipmentOptions; trackBy: trackByEquipment">
                   <input
                     type="checkbox"
                     [checked]="selectedEquipment.has(item)"
@@ -69,8 +96,10 @@ import { AppStateService } from '../../core/app-state.service';
             </div>
 
             <div class="stack">
-              <div class="muted" *ngIf="error">{{ error }}</div>
-              <button class="btn" type="submit">create booking</button>
+              <tui-notification *ngIf="error" appearance="negative">{{ error }}</tui-notification>
+              <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
+                {{ isEditing ? 'save changes' : 'create booking' }}
+              </button>
             </div>
           </form>
         </div>
@@ -85,7 +114,11 @@ export class BookingComponent {
   private readonly router = inject(Router);
 
   readonly rooms = this.state.rooms;
+  readonly bookingIdFromRoute = this.route.snapshot.paramMap.get('bookingId');
+  readonly editingBooking = this.state.bookingById(this.bookingIdFromRoute);
+  readonly isEditing = Boolean(this.editingBooking);
   readonly roomIdFromRoute =
+    this.editingBooking?.roomId ??
     this.route.snapshot.queryParamMap.get('roomId') ??
     this.route.snapshot.paramMap.get('id') ??
     this.state.selectedRoomId();
@@ -94,11 +127,16 @@ export class BookingComponent {
 
   readonly form = this.fb.nonNullable.group({
     roomId: [this.roomIdFromRoute],
-    title: [''],
-    date: ['2026-05-05', Validators.required],
-    startTime: ['10:00', Validators.required],
-    endTime: ['10:45', Validators.required],
-    participants: [4, [Validators.required, Validators.min(1)]],
+    title: [this.editingBooking?.title ?? ''],
+    date: [this.editingBooking?.date ?? '2026-06-06', Validators.required],
+    startTime: [this.editingBooking?.startTime ?? '10:00', Validators.required],
+    endTime: [this.editingBooking?.endTime ?? '10:45', Validators.required],
+    participants: [
+      this.editingBooking?.participants ?? 4,
+      [Validators.required, Validators.min(1)],
+    ],
+    recurrence: ['none' as Recurrence],
+    occurrences: [1, [Validators.required, Validators.min(1), Validators.max(12)]],
   });
 
   get room() {
@@ -109,20 +147,23 @@ export class BookingComponent {
     const room = this.state.roomById(this.roomIdFromRoute) ?? this.state.selectedRoom();
     if (room) {
       this.state.selectRoom(room.id);
-      this.selectedEquipment = new Set(room.equipment);
+      this.selectedEquipment = new Set(this.editingBooking?.equipment ?? room.equipment);
     }
 
     this.form.controls.roomId.valueChanges.pipe(takeUntilDestroyed()).subscribe((roomId) => {
       const selected = this.state.roomById(roomId);
       if (selected) {
         this.state.selectRoom(selected.id);
-        this.selectedEquipment = new Set(selected.equipment);
+        this.selectedEquipment = new Set(
+          [...this.selectedEquipment].filter((item) => selected.equipment.includes(item)),
+        );
       }
     });
   }
 
   get equipmentOptions(): string[] {
     const room = this.state.roomById(this.form.getRawValue().roomId) ?? this.state.selectedRoom();
+
     return room?.equipment ?? [];
   }
 
@@ -137,6 +178,11 @@ export class BookingComponent {
   }
 
   close(): void {
+    if (this.isEditing) {
+      void this.router.navigate(['/bookings']);
+      return;
+    }
+
     void this.router.navigate(['/room-details', this.form.getRawValue().roomId]);
   }
 
@@ -147,7 +193,7 @@ export class BookingComponent {
     }
 
     const value = this.form.getRawValue();
-    const booking = this.state.createBooking({
+    const draft = {
       roomId: value.roomId,
       title: value.title,
       date: value.date,
@@ -155,14 +201,28 @@ export class BookingComponent {
       endTime: value.endTime,
       participants: Number(value.participants),
       equipment: [...this.selectedEquipment],
-    });
+      recurrence: this.isEditing ? ('none' as Recurrence) : value.recurrence,
+      occurrences: this.isEditing ? 1 : Number(value.occurrences),
+    };
+    const result =
+      this.isEditing && this.bookingIdFromRoute
+        ? this.state.updateBooking(this.bookingIdFromRoute, draft)
+        : this.state.createBooking(draft);
 
-    if (!booking) {
-      this.error = 'the room capacity is smaller than the selected group size';
+    if (!result.ok) {
+      this.error = result.error ?? 'Booking was not saved.';
       return;
     }
 
     this.error = '';
     void this.router.navigate(['/bookings']);
+  }
+
+  trackByRoomId(_: number, room: { id: string }): string {
+    return room.id;
+  }
+
+  trackByEquipment(_: number, item: string): string {
+    return item;
   }
 }

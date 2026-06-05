@@ -1,96 +1,116 @@
 {
-    "rooms": [
-        {
-            "id": "room-1",
-            "name": "room 1",
-            "capacity": 4,
-            "equipment": [
-                "projector",
-                "wifi"
-            ],
-            "description": "Compact room for short meetings and quick decisions.",
-            "location": "floor 2, east wing",
-            "status": "free"
-        },
-        {
-            "id": "room-2",
-            "name": "room 2",
-            "capacity": 6,
-            "equipment": [
-                "projector",
-                "video conference",
-                "wifi"
-            ],
-            "description": "Good for team reviews and hybrid meetings.",
-            "location": "floor 2, north wing",
-            "status": "busy"
-        },
-        {
-            "id": "room-3",
-            "name": "room 3",
-            "capacity": 8,
-            "equipment": [
-                "video conference",
-                "whiteboard",
-                "wifi"
-            ],
-            "description": "A slightly larger room for planning sessions.",
-            "location": "floor 3, west wing",
-            "status": "free"
-        },
-        {
-            "id": "room-4",
-            "name": "room 4",
-            "capacity": 10,
-            "equipment": [
-                "projector",
-                "video conference",
-                "whiteboard",
-                "wifi"
-            ],
-            "description": "Largest room in the office for workshops.",
-            "location": "floor 3, south wing",
-            "status": "free"
-        }
-    ],
-    "bookings": [
-        {
-            "id": "booking-1",
-            "roomId": "room-1",
-            "userId": "user-1",
-            "title": "Project kickoff",
-            "date": "2026-05-02",
-            "startTime": "10:00",
-            "endTime": "10:45",
-            "participants": 3,
-            "equipment": [
-                "projector"
-            ],
-            "status": "active"
-        },
-        {
-            "id": "booking-2",
-            "roomId": "room-3",
-            "userId": "user-1",
-            "title": "Design review",
-            "date": "2026-05-03",
-            "startTime": "14:00",
-            "endTime": "15:00",
-            "participants": 5,
-            "equipment": [
-                "video conference",
-                "whiteboard"
-            ],
-            "status": "active"
-        }
-    ],
-    "users": [
-        {
-            "id": "user-1",
-            "name": "Mila Ivanova",
-            "email": "mila@venue.local",
-            "role": "employee",
-            "token": "demo-token"
-        }
-    ]
+  "rooms": [
+    {
+      "id": "room-1",
+      "companyId": "company-1",
+      "name": "room 1",
+      "capacity": 4,
+      "equipment": ["projector", "wifi"],
+      "description": "Compact room for short meetings and quick decisions.",
+      "location": "floor 2, east wing",
+      "status": "free"
+    },
+    {
+      "id": "room-2",
+      "companyId": "company-1",
+      "name": "room 2",
+      "capacity": 6,
+      "equipment": ["projector", "video conference", "wifi"],
+      "description": "Good for team reviews and hybrid meetings.",
+      "location": "floor 2, north wing",
+      "status": "busy"
+    },
+    {
+      "id": "room-3",
+      "companyId": "company-1",
+      "name": "room 3",
+      "capacity": 8,
+      "equipment": ["video conference", "whiteboard", "wifi"],
+      "description": "A slightly larger room for planning sessions.",
+      "location": "floor 3, west wing",
+      "status": "free"
+    },
+    {
+      "id": "room-4",
+      "companyId": "company-1",
+      "name": "room 4",
+      "capacity": 10,
+      "equipment": ["projector", "video conference", "whiteboard", "wifi"],
+      "description": "Largest room in the office for workshops.",
+      "location": "floor 3, south wing",
+      "status": "free"
+    },
+    {
+      "id": "room-5",
+      "companyId": "company-2",
+      "name": "partner room",
+      "capacity": 12,
+      "equipment": ["projector", "video conference"],
+      "description": "Room for another company, used to verify data separation.",
+      "location": "partner office",
+      "status": "free"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-1",
+      "roomId": "room-1",
+      "userId": "user-1",
+      "companyId": "company-1",
+      "title": "Project kickoff",
+      "date": "2026-06-06",
+      "startTime": "10:00",
+      "endTime": "10:45",
+      "participants": 3,
+      "equipment": ["projector"],
+      "status": "active",
+      "recurrence": "none"
+    },
+    {
+      "id": "booking-2",
+      "roomId": "room-3",
+      "userId": "user-1",
+      "companyId": "company-1",
+      "title": "Design review",
+      "date": "2026-06-07",
+      "startTime": "14:00",
+      "endTime": "15:00",
+      "participants": 5,
+      "equipment": ["video conference", "whiteboard"],
+      "status": "active",
+      "recurrence": "none"
+    },
+    {
+      "id": "booking-3",
+      "roomId": "room-5",
+      "userId": "user-2",
+      "companyId": "company-2",
+      "title": "Partner planning",
+      "date": "2026-06-08",
+      "startTime": "11:00",
+      "endTime": "12:00",
+      "participants": 6,
+      "equipment": ["projector"],
+      "status": "active",
+      "recurrence": "none"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-1",
+      "companyId": "company-1",
+      "name": "Mila Ivanova",
+      "email": "mila@venue.local",
+      "role": "employee",
+      "token": "demo-token"
+    },
+    {
+      "id": "user-2",
+      "companyId": "company-2",
+      "name": "Partner User",
+      "email": "partner@venue.local",
+      "role": "employee",
+      "token": "partner-token"
+    }
+  ]
 }

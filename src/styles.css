@@ -1,448 +1,529 @@
 :root {
-    --bg: #fffdf9;
-    --surface: #ffffff;
-    --sidebar: #f7d6eb;
-    --soft-yellow: #fff0b5;
-    --accent-yellow: #ffd43b;
-    --gray-card: #d9d9d9;
-    --line: #eadfd3;
-    --text: #242424;
-    --muted: #6f6a64;
-    --shadow: 0 16px 32px rgba(46, 31, 20, 0.12);
-    --radius-xl: 28px;
-    --radius-lg: 22px;
-    --radius-md: 16px;
-    --radius-sm: 12px;
-    color-scheme: light;
+  --bg: #fffdf9;
+  --surface: #ffffff;
+  --sidebar: #f7d6eb;
+  --soft-yellow: #fff0b5;
+  --accent-yellow: #ffd43b;
+  --gray-card: #d9d9d9;
+  --line: #eadfd3;
+  --text: #242424;
+  --muted: #6f6a64;
+  --shadow: 0 16px 32px rgba(46, 31, 20, 0.12);
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --tui-height-xs: 1.5rem;
+  --tui-height-s: 2rem;
+  --tui-height-m: 2.5rem;
+  --tui-height-l: 2.75rem;
+  --tui-height-xl: 3.25rem;
+  --tui-radius-xs: 8px;
+  --tui-radius-s: 10px;
+  --tui-radius-m: 12px;
+  --tui-radius-l: 14px;
+  --tui-padding-m: 1rem;
+  --tui-padding-l: 1.25rem;
+  --tui-lh: 1.5rem;
+  --tui-duration: 0.2s;
+    --tui-font-text-xs: 0.75rem/1rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    --tui-font-text-s: 0.875rem/1.25rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    --tui-font-text-m: 1rem/1.5rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    --tui-font-text-ui-m: 1rem/1.5rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    --tui-font-text-ui-l: 1.125rem/1.75rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --tui-text-primary: var(--text);
+  --tui-text-tertiary: var(--muted);
+  --tui-background-base: #ffffff;
+  --tui-background-accent-1: var(--accent-yellow);
+  --tui-status-negative: #d92d20;
+  --tui-status-positive: #137333;
+  --tui-status-warning: #b26a00;
+  --tui-status-info: #2454a6;
+  --tui-status-neutral: #6f6a64;
+  color-scheme: light;
 }
-
-@import "@taiga-ui/core/styles/taiga-ui.min.css";
 
 html,
 body {
-    margin: 0;
-    min-height: 100%;
-    background:
-        radial-gradient(circle at top left, rgba(247, 214, 235, 0.45), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(255, 240, 181, 0.45), transparent 28%), var(--bg);
-    color: var(--text);
-    font-family: Aptos, 'Trebuchet MS', 'Segoe UI', sans-serif;
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(247, 214, 235, 0.45), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(255, 240, 181, 0.45), transparent 28%), var(--bg);
+  color: var(--text);
+  font-family: Aptos, 'Trebuchet MS', 'Segoe UI', sans-serif;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 button,
 input,
 select,
 textarea {
-    font: inherit;
+  font: inherit;
 }
 
 .app-shell {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
 }
 
 .sidebar {
-    background: linear-gradient(180deg, #f9d9eb 0%, #f4cce3 100%);
-    padding: 22px 18px;
-    border-right: 1px solid rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
+  background: linear-gradient(180deg, #f9d9eb 0%, #f4cce3 100%);
+  padding: 22px 18px;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .brand {
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: lowercase;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
 }
 
 .menu {
-    display: grid;
-    gap: 10px;
+  display: grid;
+  gap: 10px;
 }
 
 .menu a {
-    padding: 12px 14px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.48);
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.48);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
 .menu a.active,
 .menu a:hover {
-    transform: translateX(3px);
-    background: rgba(255, 255, 255, 0.82);
+  transform: translateX(3px);
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .sidebar-footer {
-    margin-top: auto;
-    display: grid;
-    gap: 10px;
+  margin-top: auto;
+  display: grid;
+  gap: 10px;
 }
 
 .content {
-    padding: 22px;
+  padding: 22px;
 }
 
 .topbar {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-xl);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    box-shadow: var(--shadow);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow);
 }
 
 .eyebrow {
-    margin: 0 0 6px;
-    font-size: 0.78rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .topbar h1,
 .topbar h2 {
-    margin: 0;
-    font-size: clamp(1.4rem, 3vw, 2rem);
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
 }
 
 .user-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--soft-yellow);
-    border-radius: 999px;
-    font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--soft-yellow);
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .panel {
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow);
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
 }
 
 .filter-strip {
-    padding: 18px;
-    background: var(--soft-yellow);
-    border-radius: var(--radius-lg);
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 18px;
+  background: var(--soft-yellow);
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .field label {
-    display: block;
-    font-size: 0.82rem;
-    margin-bottom: 6px;
-    color: #5c5145;
-    text-transform: lowercase;
+  display: block;
+  font-size: 0.82rem;
+  margin-bottom: 6px;
+  color: #5c5145;
+  text-transform: lowercase;
 }
 
 .field input,
 .field select,
 .field textarea {
-    width: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.78);
-    border-radius: 14px;
-    padding: 12px 14px;
-    outline: none;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 14px;
+  padding: 12px 14px;
+  outline: none;
 }
 
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-    border-color: #d8b02c;
-    box-shadow: 0 0 0 3px rgba(255, 212, 59, 0.24);
+  border-color: #d8b02c;
+  box-shadow: 0 0 0 3px rgba(255, 212, 59, 0.24);
 }
 
 .rooms-grid {
-    margin-top: 20px;
-    display: grid;
-    gap: 18px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 20px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .room-card {
-    border: 0;
-    background: var(--gray-card);
-    min-height: 150px;
-    border-radius: 20px;
-    padding: 18px;
-    display: grid;
-    align-content: space-between;
-    cursor: pointer;
-    text-align: left;
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+  border: 0;
+  background: var(--gray-card);
+  min-height: 150px;
+  border-radius: 20px;
+  padding: 18px;
+  display: grid;
+  align-content: space-between;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  width: 100%;
+  height: 100%;
 }
 
 .room-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
 }
 
 .room-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    align-items: start;
-    font-size: 0.92rem;
-    color: #3e3b38;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+  font-size: 0.92rem;
+  color: #3e3b38;
 }
 
 .room-name {
-    font-size: 1.3rem;
-    font-weight: 800;
-    text-transform: lowercase;
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.equipment-line {
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .stack {
-    display: grid;
-    gap: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.notice {
+  margin-bottom: 16px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 68px;
+  padding: 22px 0 0;
+  font-weight: 700;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.actions-row,
+.section-heading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.section-heading {
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.compact-field {
+  min-width: 180px;
+}
+
+.admin-room-button {
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.not-found {
+  max-width: 560px;
+  margin: 20px auto 0;
 }
 
 .btn,
 .btn-outline,
 .btn-ghost {
-    border: 0;
-    border-radius: 16px;
-    padding: 12px 18px;
-    font-weight: 800;
-    cursor: pointer;
+  border: 0;
+  border-radius: 16px;
+  padding: 12px 18px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .btn {
-    background: var(--accent-yellow);
-    color: #2d2700;
+  background: var(--accent-yellow);
+  color: #2d2700;
 }
 
 .btn-outline {
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .btn-ghost {
-    background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .split-layout {
-    margin-top: 20px;
-    display: grid;
-    gap: 18px;
-    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+  margin-top: 20px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
 }
 
 .card {
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-xl);
-    padding: 20px;
-    box-shadow: var(--shadow);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  box-shadow: var(--shadow);
 }
 
 .room-hero {
-    min-height: 250px;
-    background: var(--gray-card);
-    border-radius: 20px;
-    display: grid;
-    place-items: center;
-    font-size: clamp(1.2rem, 3vw, 1.7rem);
-    font-weight: 800;
+  min-height: 250px;
+  background: var(--gray-card);
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  font-weight: 800;
 }
 
 .aside-info {
-    display: grid;
-    gap: 18px;
-    align-content: start;
+  display: grid;
+  gap: 18px;
+  align-content: start;
 }
 
 .dialog-overlay {
-    min-height: calc(100vh - 44px);
-    display: grid;
-    place-items: center;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2));
+  min-height: calc(100vh - 44px);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2));
 }
 
 .dialog-card {
-    width: min(560px, 100%);
-    background: #f7d9eb;
-    border-radius: 26px;
-    box-shadow: var(--shadow);
-    padding: 22px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+  width: min(560px, 100%);
+  background: #f7d9eb;
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .dialog-grid {
-    display: grid;
-    gap: 14px;
+  display: grid;
+  gap: 14px;
 }
 
 .checkbox-list {
-    display: grid;
-    gap: 10px;
+  display: grid;
+  gap: 10px;
 }
 
 .checkbox-list label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .summary-grid {
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .summary-card {
-    background: rgba(255, 240, 181, 0.55);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 20px;
-    padding: 18px;
+  background: rgba(255, 240, 181, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 18px;
 }
 
 .table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .table th,
 .table td {
-    padding: 14px 12px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
 }
 
 .table th {
-    font-size: 0.82rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .empty-state {
-    padding: 28px;
-    text-align: center;
-    color: var(--muted);
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
 }
 
 .auth-layout {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1.1fr minmax(360px, 0.9fr);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr minmax(360px, 0.9fr);
 }
 
 .auth-visual {
-    background: linear-gradient(180deg, #f7d6eb 0%, #f0c7df 100%);
-    padding: 32px;
-    display: grid;
-    align-content: space-between;
+  background: linear-gradient(180deg, #f7d6eb 0%, #f0c7df 100%);
+  padding: 32px;
+  display: grid;
+  align-content: space-between;
 }
 
 .auth-visual .brand {
-    font-size: 2.4rem;
+  font-size: 2.4rem;
 }
 
 .auth-card {
-    padding: 32px;
-    display: grid;
-    align-content: center;
+  padding: 32px;
+  display: grid;
+  align-content: center;
 }
 
 .auth-card .card {
-    max-width: 480px;
-    width: 100%;
-    justify-self: center;
+  max-width: 480px;
+  width: 100%;
+  justify-self: center;
 }
 
 .auth-card form {
-    display: grid;
-    gap: 14px;
+  display: grid;
+  gap: 14px;
 }
 
 .muted {
-    color: var(--muted);
+  color: var(--muted);
 }
 
 .booking-list {
-    display: grid;
-    gap: 14px;
+  display: grid;
+  gap: 14px;
 }
 
 .booking-item {
-    background: rgba(255, 240, 181, 0.46);
-    border-radius: 20px;
-    padding: 16px;
-    display: grid;
-    gap: 8px;
+  background: rgba(255, 240, 181, 0.46);
+  border-radius: 20px;
+  padding: 16px;
+  display: grid;
+  gap: 8px;
 }
 
 @media (max-width: 1100px) {
+  .app-shell,
+  .auth-layout,
+  .split-layout {
+    grid-template-columns: 1fr;
+  }
 
-    .app-shell,
-    .auth-layout,
-    .split-layout {
-        grid-template-columns: 1fr;
-    }
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 
-    .sidebar {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-    }
+  .sidebar-footer {
+    margin-top: 0;
+    width: 100%;
+  }
 
-    .sidebar-footer {
-        margin-top: 0;
-        width: 100%;
-    }
-
-    .rooms-grid,
-    .summary-grid,
-    .filter-strip {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .rooms-grid,
+  .summary-grid,
+  .filter-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 700px) {
+  .content,
+  .auth-card,
+  .auth-visual,
+  .sidebar {
+    padding: 16px;
+  }
 
-    .content,
-    .auth-card,
-    .auth-visual,
-    .sidebar {
-        padding: 16px;
-    }
+  .rooms-grid,
+  .summary-grid,
+  .filter-strip {
+    grid-template-columns: 1fr;
+  }
 
-    .rooms-grid,
-    .summary-grid,
-    .filter-strip {
-        grid-template-columns: 1fr;
-    }
+  .topbar {
+    flex-direction: column;
+    align-items: start;
+  }
 
-    .topbar {
-        flex-direction: column;
-        align-items: start;
-    }
+  .time-grid {
+    grid-template-columns: 1fr;
+  }
 }

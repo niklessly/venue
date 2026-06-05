@@ -3,14 +3,32 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TuiButton, TuiLoader, TuiNotification } from '@taiga-ui/core';
 import { AppStateService } from '../../core/app-state.service';
+import { Room } from '../../models';
+import { RoomCardComponent } from '../../shared/room-card.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RoomCardComponent,
+    TuiButton,
+    TuiLoader,
+    TuiNotification,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="panel">
+      <tui-notification
+        *ngIf="apiMessage()"
+        [appearance]="apiReady() ? 'positive' : 'warning'"
+        class="notice"
+      >
+        {{ apiMessage() }}
+      </tui-notification>
+
       <form class="filter-strip" [formGroup]="form">
         <div class="field">
           <label for="date">date</label>
@@ -26,7 +44,7 @@ import { AppStateService } from '../../core/app-state.service';
         </div>
         <div class="field">
           <label for="equipment">equipment</label>
-          <input id="equipment" formControlName="equipment" placeholder="projector" />
+          <input id="equipment" formControlName="equipment" placeholder="projector or room 4" />
         </div>
         <div class="field">
           <label for="sortBy">sort</label>
@@ -36,6 +54,10 @@ import { AppStateService } from '../../core/app-state.service';
             <option value="status">by status</option>
           </select>
         </div>
+        <label class="checkbox-field">
+          <input type="checkbox" formControlName="availableOnly" />
+          <span>available only</span>
+        </label>
       </form>
 
       <div
@@ -45,23 +67,23 @@ import { AppStateService } from '../../core/app-state.service';
           <p class="eyebrow">available rooms</p>
           <h2 style="margin:0;">choose the room that fits your meeting</h2>
         </div>
-        <div class="user-chip">{{ rooms().length }} rooms</div>
+        <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
+          <div class="user-chip">{{ rooms().length }} rooms</div>
+          <button tuiButton size="s" type="button" appearance="secondary" (click)="reset()">
+            reset filters
+          </button>
+        </div>
       </div>
 
-      <div class="rooms-grid" *ngIf="rooms().length; else emptyRooms">
-        <button
-          class="room-card"
-          *ngFor="let room of rooms()"
-          type="button"
-          (click)="openRoom(room.id)"
-        >
-          <div class="room-name">{{ room.name }}</div>
-          <div class="room-meta">
-            <span>{{ room.capacity }} seats</span>
-            <span>{{ room.status }}</span>
-          </div>
-        </button>
-      </div>
+      <tui-loader [showLoader]="loading()" [overlay]="true">
+        <div class="rooms-grid" *ngIf="rooms().length; else emptyRooms">
+          <app-room-card
+            *ngFor="let room of rooms(); trackBy: trackByRoomId"
+            [room]="room"
+            (selected)="openRoom($event)"
+          />
+        </div>
+      </tui-loader>
 
       <ng-template #emptyRooms>
         <div class="empty-state">no rooms match these filters right now.</div>
@@ -75,6 +97,9 @@ export class HomeComponent {
   private readonly router = inject(Router);
 
   readonly rooms = this.state.filteredRooms;
+  readonly loading = this.state.loading;
+  readonly apiReady = this.state.apiReady;
+  readonly apiMessage = this.state.apiMessage;
 
   readonly form = this.fb.nonNullable.group({
     date: [''],
@@ -82,6 +107,7 @@ export class HomeComponent {
     capacity: [0],
     equipment: [''],
     sortBy: ['name' as const],
+    availableOnly: [false],
   });
 
   constructor() {
@@ -92,6 +118,7 @@ export class HomeComponent {
         capacity: value.capacity ? Number(value.capacity) : null,
         equipment: value.equipment ?? '',
         sortBy: value.sortBy ?? 'name',
+        availableOnly: value.availableOnly ?? false,
       });
     });
 
@@ -101,5 +128,21 @@ export class HomeComponent {
   openRoom(roomId: string): void {
     this.state.selectRoom(roomId);
     void this.router.navigate(['/room-details', roomId]);
+  }
+
+  reset(): void {
+    this.form.reset({
+      date: '',
+      time: '',
+      capacity: 0,
+      equipment: '',
+      sortBy: 'name',
+      availableOnly: false,
+    });
+    this.state.resetFilters();
+  }
+
+  trackByRoomId(_: number, room: Room): string {
+    return room.id;
   }
 }

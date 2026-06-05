@@ -54,6 +54,11 @@ export const routes: Routes = [
           import('./features/bookings/bookings.component').then((m) => m.BookingsComponent),
       },
       {
+        path: 'bookings/:bookingId/edit',
+        loadComponent: () =>
+          import('./features/booking/booking.component').then((m) => m.BookingComponent),
+      },
+      {
         path: 'statistics',
         loadComponent: () =>
           import('./features/statistics/statistics.component').then((m) => m.StatisticsComponent),
@@ -64,7 +69,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/admin.component').then((m) => m.AdminComponent),
       },
+      {
+        path: '404',
+        loadComponent: () =>
+          import('./features/not-found/not-found.component').then((m) => m.NotFoundComponent),
+      },
     ],
   },
-  { path: '**', redirectTo: 'rooms' },
+  { path: '**', redirectTo: '404' },
 ];

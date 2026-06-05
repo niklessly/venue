@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { TuiButton } from '@taiga-ui/core';
+import { TuiBadge } from '@taiga-ui/kit';
 import { AppStateService } from '../core/app-state.service';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TuiBadge, TuiButton],
   template: `
     <div class="app-shell">
       <aside class="sidebar">
@@ -17,8 +19,10 @@ import { AppStateService } from '../core/app-state.service';
           <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="active">admin</a>
         </nav>
         <div class="sidebar-footer">
-          <div class="muted">pink & yellow office booking prototype</div>
-          <button class="btn-ghost" type="button" (click)="logout()">logout</button>
+          <div class="muted">{{ apiMessage() }}</div>
+          <button tuiButton size="s" appearance="secondary" type="button" (click)="logout()">
+            logout
+          </button>
         </div>
       </aside>
 
@@ -28,7 +32,10 @@ import { AppStateService } from '../core/app-state.service';
             <p class="eyebrow">meeting rooms</p>
             <h1>{{ title }}</h1>
           </div>
-          <div class="user-chip">{{ userName() }}</div>
+          <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
+            <span tuiBadge appearance="info">next {{ notificationCount() }}</span>
+            <div class="user-chip">{{ userName() }}</div>
+          </div>
         </header>
 
         <router-outlet />
@@ -42,6 +49,8 @@ export class MainShellComponent {
 
   readonly userName = computed(() => this.state.user()?.name ?? 'guest');
   readonly isAdmin = computed(() => this.state.user()?.role === 'admin');
+  readonly notificationCount = computed(() => this.state.upcomingNotifications().length);
+  readonly apiMessage = this.state.apiMessage;
 
   get title(): string {
     const url = this.router.url;

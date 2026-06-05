@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TuiButton } from '@taiga-ui/core';
 import { AppStateService } from '../../core/app-state.service';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TuiButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="auth-layout">
@@ -64,7 +65,9 @@ import { AppStateService } from '../../core/app-state.service';
               />
             </div>
 
-            <button class="btn" type="submit" [disabled]="form.invalid">enter dashboard</button>
+            <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
+              enter dashboard
+            </button>
           </form>
         </div>
       </div>

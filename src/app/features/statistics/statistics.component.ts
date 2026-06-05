@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { TuiProgressBar } from '@taiga-ui/kit';
 import { AppStateService } from '../../core/app-state.service';
+import { Room } from '../../models';
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TuiProgressBar],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="stack">
@@ -31,19 +33,15 @@ import { AppStateService } from '../../core/app-state.service';
         <div class="card">
           <p class="eyebrow">room usage</p>
           <div class="stack">
-            <div *ngFor="let room of rooms()" style="display:grid; gap: 8px;">
+            <div
+              *ngFor="let room of rooms(); trackBy: trackByRoomId"
+              style="display:grid; gap: 8px;"
+            >
               <div style="display:flex; justify-content:space-between; gap: 10px;">
                 <strong>{{ room.name }}</strong>
                 <span>{{ usage(room.id) }} bookings</span>
               </div>
-              <div
-                style="height: 12px; background: rgba(0, 0, 0, 0.06); border-radius: 999px; overflow: hidden;"
-              >
-                <div
-                  [style.width.%]="bar(room.id)"
-                  style="height: 100%; background: var(--accent-yellow);"
-                ></div>
-              </div>
+              <progress tuiProgressBar max="100" [value]="bar(room.id)"></progress>
             </div>
           </div>
         </div>
@@ -81,5 +79,9 @@ export class StatisticsComponent {
   bar(roomId: string): number {
     const max = Math.max(...this.rooms().map((room) => this.usage(room.id)), 1);
     return Math.round((this.usage(roomId) / max) * 100);
+  }
+
+  trackByRoomId(_: number, room: Room): string {
+    return room.id;
   }
 }
