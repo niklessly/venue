@@ -159,13 +159,19 @@ export class AdminComponent {
   }
 
   loadRoom(roomId: string): void {
+    this.setRoomForm(roomId, true);
+  }
+
+  private setRoomForm(roomId: string, clearMessage: boolean): void {
     const room = this.state.roomById(roomId);
     if (!room) {
       return;
     }
 
     this.selectedRoomId = roomId;
-    this.message = '';
+    if (clearMessage) {
+      this.message = '';
+    }
     this.form.setValue({
       name: room.name,
       capacity: room.capacity,
@@ -210,9 +216,11 @@ export class AdminComponent {
     this.message = 'Room deleted.';
     this.selectedRoomId = this.rooms()[0]?.id ?? null;
     if (this.selectedRoomId) {
-      this.loadRoom(this.selectedRoomId);
+      this.setRoomForm(this.selectedRoomId, false);
     } else {
       this.newRoom();
+      this.messageType = 'positive';
+      this.message = 'Room deleted.';
     }
   }
 
