@@ -1,0 +1,9 @@
+node_modules
+dist
+.angular
+.cache
+.DS_Store
+coverage
+*.log
+test-results/
+playwright-report/
