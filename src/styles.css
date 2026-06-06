@@ -26,11 +26,11 @@
   --tui-padding-l: 1.25rem;
   --tui-lh: 1.5rem;
   --tui-duration: 0.2s;
-    --tui-font-text-xs: 0.75rem/1rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
-    --tui-font-text-s: 0.875rem/1.25rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
-    --tui-font-text-m: 1rem/1.5rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
-    --tui-font-text-ui-m: 1rem/1.5rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
-    --tui-font-text-ui-l: 1.125rem/1.75rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --tui-font-text-xs: 0.75rem/1rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --tui-font-text-s: 0.875rem/1.25rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --tui-font-text-m: 1rem/1.5rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --tui-font-text-ui-m: 1rem/1.5rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --tui-font-text-ui-l: 1.125rem/1.75rem 'Aptos', 'Trebuchet MS', 'Segoe UI', sans-serif;
   --tui-text-primary: var(--text);
   --tui-text-tertiary: var(--muted);
   --tui-background-base: #ffffff;
@@ -118,6 +118,33 @@ textarea {
   gap: 10px;
 }
 
+.language-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(44px, 1fr));
+  gap: 4px;
+  padding: 4px;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+}
+
+.language-switch button {
+  border: 0;
+  border-radius: 999px;
+  min-height: 30px;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.language-switch button.active {
+  background: var(--accent-yellow);
+  color: #2d2700;
+}
+
 .content {
   padding: 22px;
 }
@@ -165,10 +192,34 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.workflow-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.workflow-step {
+  min-height: 104px;
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  background: rgba(255, 240, 181, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 18px;
+}
+
+.workflow-step span {
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .filter-strip {
-  padding: 18px;
+  padding: 16px;
   background: var(--soft-yellow);
   border-radius: var(--radius-lg);
   display: grid;
@@ -249,6 +300,15 @@ textarea {
 .equipment-line {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.card-action {
+  width: fit-content;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 800;
 }
 
 .stack {
@@ -499,6 +559,7 @@ textarea {
 
   .rooms-grid,
   .summary-grid,
+  .workflow-strip,
   .filter-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -514,6 +575,7 @@ textarea {
 
   .rooms-grid,
   .summary-grid,
+  .workflow-strip,
   .filter-strip {
     grid-template-columns: 1fr;
   }

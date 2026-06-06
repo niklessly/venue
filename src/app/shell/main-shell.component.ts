@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { TuiButton } from '@taiga-ui/core';
 import { TuiBadge } from '@taiga-ui/kit';
 import { AppStateService } from '../core/app-state.service';
+import { I18nService, Language } from '../core/i18n.service';
 
 @Component({
   standalone: true,
@@ -13,15 +14,33 @@ import { AppStateService } from '../core/app-state.service';
       <aside class="sidebar">
         <div class="brand">venue</div>
         <nav class="menu">
-          <a routerLink="/rooms" routerLinkActive="active">dashboard</a>
-          <a routerLink="/bookings" routerLinkActive="active">bookings</a>
-          <a routerLink="/statistics" routerLinkActive="active">statistics</a>
-          <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="active">admin</a>
+          <a routerLink="/rooms" routerLinkActive="active">{{ i18n.t('dashboard') }}</a>
+          <a routerLink="/bookings" routerLinkActive="active">{{ i18n.t('myBookings') }}</a>
+          <a routerLink="/statistics" routerLinkActive="active">{{ i18n.t('statistics') }}</a>
+          <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="active">
+            {{ i18n.t('adminPanel') }}
+          </a>
         </nav>
         <div class="sidebar-footer">
-          <div class="muted">{{ apiMessage() }}</div>
+          <div class="language-switch" [attr.aria-label]="i18n.t('language')">
+            <button
+              type="button"
+              [class.active]="i18n.language() === 'ru'"
+              (click)="setLanguage('ru')"
+            >
+              RU
+            </button>
+            <button
+              type="button"
+              [class.active]="i18n.language() === 'en'"
+              (click)="setLanguage('en')"
+            >
+              EN
+            </button>
+          </div>
+          <div class="muted">{{ i18n.message(apiMessage()) }}</div>
           <button tuiButton size="s" appearance="secondary" type="button" (click)="logout()">
-            logout
+            {{ i18n.t('logout') }}
           </button>
         </div>
       </aside>
@@ -29,11 +48,11 @@ import { AppStateService } from '../core/app-state.service';
       <main class="content">
         <header class="topbar">
           <div>
-            <p class="eyebrow">meeting rooms</p>
+            <p class="eyebrow">{{ i18n.t('meetingRooms') }}</p>
             <h1>{{ title }}</h1>
           </div>
           <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
-            <span tuiBadge appearance="info">next {{ notificationCount() }}</span>
+            <span tuiBadge appearance="info"> {{ i18n.t('next') }} {{ notificationCount() }} </span>
             <div class="user-chip">{{ userName() }}</div>
           </div>
         </header>
@@ -46,6 +65,7 @@ import { AppStateService } from '../core/app-state.service';
 export class MainShellComponent {
   private readonly state = inject(AppStateService);
   private readonly router = inject(Router);
+  readonly i18n = inject(I18nService);
 
   readonly userName = computed(() => this.state.user()?.name ?? 'guest');
   readonly isAdmin = computed(() => this.state.user()?.role === 'admin');
@@ -55,22 +75,26 @@ export class MainShellComponent {
   get title(): string {
     const url = this.router.url;
     if (url.includes('/statistics')) {
-      return 'statistics';
+      return this.i18n.t('statistics');
     }
     if (url.includes('/room-details')) {
-      return 'room details';
+      return this.i18n.t('roomDetails');
     }
     if (url.includes('/bookings')) {
-      return 'my bookings';
+      return this.i18n.t('myBookings');
     }
     if (url.includes('/admin')) {
-      return 'admin panel';
+      return this.i18n.t('adminPanel');
     }
-    return 'available rooms';
+    return this.i18n.t('availableRooms');
   }
 
   logout(): void {
     this.state.logout();
     void this.router.navigate(['/auth/login']);
+  }
+
+  setLanguage(language: Language): void {
+    this.i18n.setLanguage(language);
   }
 }

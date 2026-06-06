@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { TuiButton, TuiNotification } from '@taiga-ui/core';
 import { TuiBadge } from '@taiga-ui/kit';
 import { AppStateService } from '../../core/app-state.service';
+import { I18nService } from '../../core/i18n.service';
 import { Booking, BookingStatus } from '../../models';
 
 type BookingFilter = 'all' | BookingStatus;
@@ -16,28 +17,29 @@ type BookingFilter = 'all' | BookingStatus;
     <section class="stack">
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="eyebrow">active</div>
+          <div class="eyebrow">{{ i18n.t('active') }}</div>
           <h2 style="margin:0;">{{ activeCount() }}</h2>
         </div>
         <div class="summary-card">
-          <div class="eyebrow">upcoming rooms</div>
+          <div class="eyebrow">{{ i18n.t('upcomingRooms') }}</div>
           <h2 style="margin:0;">{{ distinctRooms() }}</h2>
         </div>
         <div class="summary-card">
-          <div class="eyebrow">cancelled</div>
+          <div class="eyebrow">{{ i18n.t('cancelled') }}</div>
           <h2 style="margin:0;">{{ cancelledCount() }}</h2>
         </div>
         <div class="summary-card">
-          <div class="eyebrow">today</div>
+          <div class="eyebrow">{{ i18n.t('today') }}</div>
           <h2 style="margin:0;">{{ todayCount() }}</h2>
         </div>
       </div>
 
       <div class="card" *ngIf="notifications().length">
-        <p class="eyebrow">upcoming notifications</p>
+        <p class="eyebrow">{{ i18n.t('upcomingNotifications') }}</p>
         <div class="stack" style="gap: 10px;">
           <tui-notification *ngFor="let booking of notifications(); trackBy: trackByBookingId">
-            {{ booking.date }} at {{ booking.startTime }} · {{ booking.title }} in
+            {{ booking.date }} · {{ booking.startTime }} · {{ i18n.title(booking.title) }}
+            {{ i18n.t('inRoom') }}
             {{ roomName(booking.roomId) }}
           </tui-notification>
         </div>
@@ -46,21 +48,21 @@ type BookingFilter = 'all' | BookingStatus;
       <div class="card">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">my bookings</p>
-            <h2 style="margin: 0;">schedule</h2>
+            <p class="eyebrow">{{ i18n.t('myBookings') }}</p>
+            <h2 style="margin: 0;">{{ i18n.t('schedule') }}</h2>
           </div>
           <div class="field compact-field">
-            <label for="statusFilter">status</label>
+            <label for="statusFilter">{{ i18n.t('status') }}</label>
             <select id="statusFilter" [value]="statusFilter" (change)="setStatusFilter($event)">
-              <option value="all">all</option>
-              <option value="active">active</option>
-              <option value="cancelled">cancelled</option>
+              <option value="all">{{ i18n.t('all') }}</option>
+              <option value="active">{{ i18n.status('active') }}</option>
+              <option value="cancelled">{{ i18n.status('cancelled') }}</option>
             </select>
           </div>
         </div>
 
         <tui-notification *ngIf="error" appearance="negative" class="notice">
-          {{ error }}
+          {{ i18n.message(error) }}
         </tui-notification>
 
         <div class="booking-list" *ngIf="visibleBookings().length; else emptyBookings">
@@ -70,16 +72,17 @@ type BookingFilter = 'all' | BookingStatus;
           >
             <div style="display:flex; justify-content:space-between; gap: 10px; align-items:start;">
               <div>
-                <strong>{{ booking.title }}</strong>
+                <strong>{{ i18n.title(booking.title) }}</strong>
                 <div class="muted">{{ roomName(booking.roomId) }}</div>
               </div>
               <span tuiBadge [appearance]="booking.status === 'active' ? 'positive' : 'neutral'">
-                {{ booking.status }}
+                {{ i18n.status(booking.status) }}
               </span>
             </div>
             <div>{{ booking.date }} · {{ booking.startTime }} - {{ booking.endTime }}</div>
             <div class="muted">
-              {{ booking.participants }} participants · repeat: {{ booking.recurrence }}
+              {{ booking.participants }} {{ i18n.t('participants') }} · {{ i18n.t('repeat') }}:
+              {{ i18n.recurrence(booking.recurrence) }}
             </div>
             <div class="actions-row">
               <a
@@ -88,7 +91,7 @@ type BookingFilter = 'all' | BookingStatus;
                 appearance="secondary"
                 [routerLink]="['/room-details', booking.roomId]"
               >
-                open room
+                {{ i18n.t('openRoom') }}
               </a>
               <a
                 tuiButton
@@ -96,7 +99,7 @@ type BookingFilter = 'all' | BookingStatus;
                 appearance="secondary"
                 [routerLink]="['/bookings', booking.id, 'edit']"
               >
-                edit
+                {{ i18n.t('edit') }}
               </a>
               <button
                 tuiButton
@@ -106,7 +109,7 @@ type BookingFilter = 'all' | BookingStatus;
                 [disabled]="booking.status === 'cancelled'"
                 (click)="cancel(booking.id)"
               >
-                cancel
+                {{ i18n.t('cancelBooking') }}
               </button>
               <button
                 tuiButton
@@ -115,14 +118,14 @@ type BookingFilter = 'all' | BookingStatus;
                 appearance="destructive"
                 (click)="remove(booking.id)"
               >
-                delete
+                {{ i18n.t('delete') }}
               </button>
             </div>
           </article>
         </div>
 
         <ng-template #emptyBookings>
-          <div class="empty-state">you do not have any bookings for this filter.</div>
+          <div class="empty-state">{{ i18n.t('noBookings') }}</div>
         </ng-template>
       </div>
     </section>
@@ -130,6 +133,7 @@ type BookingFilter = 'all' | BookingStatus;
 })
 export class BookingsComponent {
   private readonly state = inject(AppStateService);
+  readonly i18n = inject(I18nService);
 
   readonly bookings = this.state.currentUserBookings;
   readonly notifications = this.state.upcomingNotifications;
@@ -169,7 +173,7 @@ export class BookingsComponent {
   }
 
   roomName(roomId: string): string {
-    return this.state.roomById(roomId)?.name ?? 'room';
+    return this.i18n.roomName(this.state.roomById(roomId) ?? this.i18n.t('room'));
   }
 
   setStatusFilter(event: Event): void {

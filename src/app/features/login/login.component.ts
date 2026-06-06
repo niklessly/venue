@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TuiButton } from '@taiga-ui/core';
 import { AppStateService } from '../../core/app-state.service';
+import { I18nService, Language } from '../../core/i18n.service';
 
 @Component({
   standalone: true,
@@ -13,40 +14,64 @@ import { AppStateService } from '../../core/app-state.service';
     <section class="auth-layout">
       <aside class="auth-visual">
         <div>
-          <div class="brand">venue</div>
+          <div style="display:flex; justify-content:space-between; gap: 14px; align-items:start;">
+            <div class="brand">venue</div>
+            <div class="language-switch" [attr.aria-label]="i18n.t('language')">
+              <button
+                type="button"
+                [class.active]="i18n.language() === 'ru'"
+                (click)="setLanguage('ru')"
+              >
+                RU
+              </button>
+              <button
+                type="button"
+                [class.active]="i18n.language() === 'en'"
+                (click)="setLanguage('en')"
+              >
+                EN
+              </button>
+            </div>
+          </div>
           <p class="muted" style="max-width: 28rem; margin-top: 10px;">
-            simple room booking prototype with a soft pink and yellow interface.
+            {{ i18n.t('loginVisualLead') }}
           </p>
         </div>
 
         <div class="stack">
           <div class="room-card">
-            <div class="room-name">dashboard</div>
-            <div class="room-meta"><span>filter by date</span><span>capacity</span></div>
+            <div class="room-name">{{ i18n.t('filterStepTitle') }}</div>
+            <div class="room-meta">
+              <span>{{ i18n.t('date') }}</span>
+              <span>{{ i18n.t('capacity') }}</span>
+            </div>
           </div>
           <div class="room-card">
-            <div class="room-name">room 1</div>
-            <div class="room-meta"><span>quiet room</span><span>projector</span></div>
+            <div class="room-name">{{ i18n.roomName('room 1') }}</div>
+            <div class="room-meta">
+              <span>{{ i18n.equipment('whiteboard') }}</span>
+              <span>{{ i18n.equipment('projector') }}</span>
+            </div>
           </div>
         </div>
       </aside>
 
       <div class="auth-card">
         <div class="card">
-          <p class="eyebrow">welcome back</p>
-          <h1 style="margin: 0 0 8px;">login</h1>
+          <p class="eyebrow">{{ i18n.t('welcomeBack') }}</p>
+          <h1 style="margin: 0 0 8px;">{{ i18n.t('login') }}</h1>
           <p class="muted" style="margin: 0 0 24px;">
-            sign in to view rooms, create bookings and manage your schedule.
+            {{ i18n.t('loginLead') }}
           </p>
 
           <form [formGroup]="form" (ngSubmit)="submit()">
             <div class="field">
-              <label for="name">name</label>
+              <label for="name">{{ i18n.t('name') }}</label>
               <input id="name" formControlName="name" placeholder="Mila Ivanova" />
             </div>
 
             <div class="field">
-              <label for="email">email</label>
+              <label for="email">{{ i18n.t('email') }}</label>
               <input
                 id="email"
                 type="email"
@@ -56,7 +81,7 @@ import { AppStateService } from '../../core/app-state.service';
             </div>
 
             <div class="field">
-              <label for="password">password</label>
+              <label for="password">{{ i18n.t('password') }}</label>
               <input
                 id="password"
                 type="password"
@@ -66,7 +91,7 @@ import { AppStateService } from '../../core/app-state.service';
             </div>
 
             <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
-              enter dashboard
+              {{ i18n.t('enterDashboard') }}
             </button>
           </form>
         </div>
@@ -78,6 +103,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly state = inject(AppStateService);
   private readonly router = inject(Router);
+  readonly i18n = inject(I18nService);
 
   readonly form = this.fb.nonNullable.group({
     name: ['Mila Ivanova', Validators.required],
@@ -93,5 +119,9 @@ export class LoginComponent {
     const value = this.form.getRawValue();
     this.state.login(value.email, value.name || value.email.split('@')[0]);
     void this.router.navigate(['/rooms']);
+  }
+
+  setLanguage(language: Language): void {
+    this.i18n.setLanguage(language);
   }
 }

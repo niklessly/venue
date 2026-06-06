@@ -54,13 +54,17 @@ export class AppStateService {
   readonly filteredRooms = computed(() => {
     const filters = this.filters();
     const equipmentQuery = filters.equipment.trim().toLowerCase();
+    const normalizedEquipmentQuery = this.normalizeSearchQuery(equipmentQuery);
     const base = this.rooms().filter((room) => {
       const fitsCapacity = !filters.capacity || room.capacity >= filters.capacity;
       const fitsEquipment =
         !equipmentQuery ||
-        room.equipment.some((item) => item.toLowerCase().includes(equipmentQuery)) ||
-        room.name.toLowerCase().includes(equipmentQuery) ||
-        room.location.toLowerCase().includes(equipmentQuery);
+        [equipmentQuery, normalizedEquipmentQuery].some(
+          (query) =>
+            room.equipment.some((item) => item.toLowerCase().includes(query)) ||
+            room.name.toLowerCase().includes(query) ||
+            room.location.toLowerCase().includes(query),
+        );
       const fitsAvailability =
         !filters.availableOnly ||
         !filters.date ||
@@ -580,6 +584,18 @@ export class AppStateService {
 
   private slug(value: string): string {
     return value.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || this.uuid();
+  }
+
+  private normalizeSearchQuery(value: string): string {
+    return value
+      .replaceAll('проектор', 'projector')
+      .replaceAll('видеосвязь', 'video conference')
+      .replaceAll('видео', 'video')
+      .replaceAll('доска', 'whiteboard')
+      .replaceAll('вайфай', 'wifi')
+      .replaceAll('wi-fi', 'wifi')
+      .replaceAll('зал', 'room')
+      .replaceAll('этаж', 'floor');
   }
 
   private sync<T>(requestFactory: () => Observable<T> | undefined): void {

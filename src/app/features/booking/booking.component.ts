@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TuiButton, TuiNotification } from '@taiga-ui/core';
 import { AppStateService } from '../../core/app-state.service';
+import { I18nService } from '../../core/i18n.service';
 import { Recurrence } from '../../models';
 
 @Component({
@@ -17,60 +18,66 @@ import { Recurrence } from '../../models';
         <div class="dialog-grid">
           <div style="display:flex; justify-content:space-between; gap: 12px; align-items:start;">
             <div>
-              <p class="eyebrow">{{ isEditing ? 'edit booking' : 'create booking' }}</p>
-              <h2 style="margin: 0;">{{ room?.name ?? 'choose room' }}</h2>
+              <p class="eyebrow">
+                {{ isEditing ? i18n.t('editBooking') : i18n.t('createBooking') }}
+              </p>
+              <h2 style="margin: 0;">{{ i18n.roomName(room) || i18n.t('chooseRoom') }}</h2>
             </div>
             <button tuiButton size="s" appearance="secondary" type="button" (click)="close()">
-              close
+              {{ i18n.t('close') }}
             </button>
           </div>
 
           <form class="dialog-grid" [formGroup]="form" (ngSubmit)="submit()">
             <div class="field">
-              <label for="roomId">room</label>
+              <label for="roomId">{{ i18n.t('room') }}</label>
               <select id="roomId" formControlName="roomId">
                 <option *ngFor="let item of rooms(); trackBy: trackByRoomId" [value]="item.id">
-                  {{ item.name }}
+                  {{ i18n.roomName(item) }}
                 </option>
               </select>
             </div>
 
             <div class="field">
-              <label for="title">title</label>
-              <input id="title" formControlName="title" placeholder="team sync" />
+              <label for="title">{{ i18n.t('bookingTitle') }}</label>
+              <input
+                id="title"
+                formControlName="title"
+                [placeholder]="i18n.t('bookingTitlePlaceholder')"
+              />
             </div>
 
             <div class="time-grid">
               <div class="field">
-                <label for="date">date</label>
+                <label for="date">{{ i18n.t('date') }}</label>
                 <input id="date" type="date" formControlName="date" />
               </div>
               <div class="field">
-                <label for="startTime">time</label>
+                <label for="startTime">{{ i18n.t('startTime') }}</label>
                 <input id="startTime" type="time" formControlName="startTime" />
               </div>
               <div class="field">
-                <label for="endTime">end</label>
+                <label for="endTime">{{ i18n.t('end') }}</label>
                 <input id="endTime" type="time" formControlName="endTime" />
               </div>
             </div>
 
             <div class="field">
-              <label for="participants">participants</label>
+              <label for="participants">{{ i18n.t('participants') }}</label>
               <input id="participants" type="number" min="1" formControlName="participants" />
             </div>
 
             <div class="time-grid" *ngIf="!isEditing">
               <div class="field">
-                <label for="recurrence">repeat</label>
+                <label for="recurrence">{{ i18n.t('repeat') }}</label>
                 <select id="recurrence" formControlName="recurrence">
-                  <option value="none">none</option>
-                  <option value="daily">daily</option>
-                  <option value="weekly">weekly</option>
+                  <option value="none">{{ i18n.recurrence('none') }}</option>
+                  <option value="daily">{{ i18n.recurrence('daily') }}</option>
+                  <option value="weekly">{{ i18n.recurrence('weekly') }}</option>
                 </select>
               </div>
               <div class="field">
-                <label for="occurrences">occurrences</label>
+                <label for="occurrences">{{ i18n.t('occurrences') }}</label>
                 <input
                   id="occurrences"
                   type="number"
@@ -82,7 +89,7 @@ import { Recurrence } from '../../models';
             </div>
 
             <div>
-              <p class="eyebrow">required equipment</p>
+              <p class="eyebrow">{{ i18n.t('requiredEquipment') }}</p>
               <div class="checkbox-list">
                 <label *ngFor="let item of equipmentOptions; trackBy: trackByEquipment">
                   <input
@@ -90,15 +97,17 @@ import { Recurrence } from '../../models';
                     [checked]="selectedEquipment.has(item)"
                     (change)="toggleEquipment(item, $event)"
                   />
-                  <span>{{ item }}</span>
+                  <span>{{ i18n.equipment(item) }}</span>
                 </label>
               </div>
             </div>
 
             <div class="stack">
-              <tui-notification *ngIf="error" appearance="negative">{{ error }}</tui-notification>
+              <tui-notification *ngIf="error" appearance="negative">
+                {{ i18n.message(error) }}
+              </tui-notification>
               <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
-                {{ isEditing ? 'save changes' : 'create booking' }}
+                {{ isEditing ? i18n.t('saveChanges') : i18n.t('createBooking') }}
               </button>
             </div>
           </form>
@@ -112,6 +121,7 @@ export class BookingComponent {
   private readonly state = inject(AppStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  readonly i18n = inject(I18nService);
 
   readonly rooms = this.state.rooms;
   readonly bookingIdFromRoute = this.route.snapshot.paramMap.get('bookingId');

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TuiButton } from '@taiga-ui/core';
 import { TuiBadge } from '@taiga-ui/kit';
 import { AppStateService } from '../../core/app-state.service';
+import { I18nService } from '../../core/i18n.service';
 import { Booking } from '../../models';
 
 @Component({
@@ -13,54 +14,58 @@ import { Booking } from '../../models';
   template: `
     <section class="split-layout">
       <article class="card stack">
-        <div class="room-hero">{{ room?.name ?? 'room' }}</div>
+        <div class="room-hero">{{ i18n.roomName(room) || i18n.t('room') }}</div>
 
         <div>
-          <p class="eyebrow">about this room</p>
-          <h2 style="margin: 0 0 8px;">{{ room?.name }}</h2>
-          <p class="muted" style="margin: 0; max-width: 60ch;">{{ room?.description }}</p>
+          <p class="eyebrow">{{ i18n.t('roomDetails') }}</p>
+          <h2 style="margin: 0 0 8px;">{{ i18n.roomName(room) }}</h2>
+          <p class="muted" style="margin: 0; max-width: 60ch;">
+            {{ i18n.description(room?.description) }}
+          </p>
         </div>
 
-        <button tuiButton class="btn" type="button" (click)="book()">book this room</button>
+        <button tuiButton class="btn" type="button" (click)="book()">
+          {{ i18n.t('bookThisRoom') }}
+        </button>
       </article>
 
       <aside class="aside-info">
         <div class="card">
-          <p class="eyebrow">status</p>
+          <p class="eyebrow">{{ i18n.t('status') }}</p>
           <span tuiBadge [appearance]="status() === 'free' ? 'positive' : 'warning'">
-            {{ status() }}
+            {{ i18n.status(status()) }}
           </span>
         </div>
 
         <div class="card">
-          <p class="eyebrow">capacity</p>
-          <h2 style="margin: 0;">{{ room?.capacity }} people</h2>
+          <p class="eyebrow">{{ i18n.t('capacity') }}</p>
+          <h2 style="margin: 0;">{{ i18n.seats(room?.capacity) }}</h2>
         </div>
 
         <div class="card">
-          <p class="eyebrow">equipment</p>
+          <p class="eyebrow">{{ i18n.t('equipment') }}</p>
           <div class="stack" style="gap: 10px;">
-            <span *ngFor="let item of room?.equipment">{{ item }}</span>
+            <span *ngFor="let item of room?.equipment">{{ i18n.equipment(item) }}</span>
           </div>
         </div>
 
         <div class="card">
-          <p class="eyebrow">location</p>
-          <div>{{ room?.location }}</div>
+          <p class="eyebrow">{{ i18n.t('location') }}</p>
+          <div>{{ i18n.location(room?.location) }}</div>
         </div>
 
         <div class="card">
-          <p class="eyebrow">active schedule</p>
+          <p class="eyebrow">{{ i18n.t('activeSchedule') }}</p>
           <div class="stack" style="gap: 10px;" *ngIf="activeBookings().length; else freeSchedule">
             <div *ngFor="let booking of activeBookings(); trackBy: trackByBookingId">
-              <strong>{{ booking.title }}</strong>
+              <strong>{{ i18n.title(booking.title) }}</strong>
               <div class="muted">
                 {{ booking.date }} · {{ booking.startTime }} - {{ booking.endTime }}
               </div>
             </div>
           </div>
           <ng-template #freeSchedule>
-            <div class="muted">no active bookings for this room.</div>
+            <div class="muted">{{ i18n.t('noActiveBookings') }}</div>
           </ng-template>
         </div>
       </aside>
@@ -71,6 +76,7 @@ export class RoomDetailsComponent {
   private readonly state = inject(AppStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  readonly i18n = inject(I18nService);
 
   readonly roomId = this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
   readonly room = this.state.roomById(this.roomId) ?? this.state.selectedRoom();

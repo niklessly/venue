@@ -74,6 +74,15 @@ describe('AppStateService', () => {
     expect(service.filteredRooms().some((room) => room.id === 'room-1')).toBe(false);
   });
 
+  it('filters by Russian equipment aliases', () => {
+    service.setFilters({ equipment: 'проектор' });
+
+    expect(service.filteredRooms()).toHaveLength(3);
+    expect(service.filteredRooms().every((room) => room.equipment.includes('projector'))).toBe(
+      true,
+    );
+  });
+
   it('createBooking returns an error when room does not exist', () => {
     const result = service.createBooking(makeDraft({ roomId: 'unknown' }));
     expect(result.ok).toBe(false);

@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiButton, TuiNotification } from '@taiga-ui/core';
 import { TuiBadge } from '@taiga-ui/kit';
 import { AppStateService } from '../../core/app-state.service';
+import { I18nService } from '../../core/i18n.service';
 import { Room } from '../../models';
 
 @Component({
@@ -15,60 +16,62 @@ import { Room } from '../../models';
       <div class="card stack">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">{{ selectedRoomId ? 'edit room' : 'create room' }}</p>
-            <h2 style="margin: 0;">room catalog</h2>
+            <p class="eyebrow">
+              {{ selectedRoomId ? i18n.t('editRoom') : i18n.t('createRoom') }}
+            </p>
+            <h2 style="margin: 0;">{{ i18n.t('roomCatalog') }}</h2>
           </div>
           <button tuiButton size="s" type="button" appearance="secondary" (click)="newRoom()">
-            new room
+            {{ i18n.t('newRoom') }}
           </button>
         </div>
 
         <div class="field">
-          <label for="roomId">room</label>
+          <label for="roomId">{{ i18n.t('room') }}</label>
           <select id="roomId" [value]="selectedRoomId ?? ''" (change)="pickRoom($event)">
-            <option value="">new room</option>
+            <option value="">{{ i18n.t('newRoom') }}</option>
             <option *ngFor="let room of rooms(); trackBy: trackByRoomId" [value]="room.id">
-              {{ room.name }}
+              {{ i18n.roomName(room) }}
             </option>
           </select>
         </div>
 
         <form class="stack" [formGroup]="form" (ngSubmit)="save()">
           <div class="field">
-            <label for="name">name</label>
+            <label for="name">{{ i18n.t('name') }}</label>
             <input id="name" formControlName="name" />
           </div>
           <div class="field">
-            <label for="capacity">capacity</label>
+            <label for="capacity">{{ i18n.t('capacity') }}</label>
             <input id="capacity" type="number" min="1" formControlName="capacity" />
           </div>
           <div class="field">
-            <label for="location">location</label>
+            <label for="location">{{ i18n.t('location') }}</label>
             <input id="location" formControlName="location" />
           </div>
           <div class="field">
-            <label for="description">description</label>
+            <label for="description">{{ i18n.t('description') }}</label>
             <textarea id="description" rows="4" formControlName="description"></textarea>
           </div>
           <div class="field">
-            <label for="equipment">equipment (comma separated)</label>
+            <label for="equipment">{{ i18n.t('equipmentComma') }}</label>
             <input id="equipment" formControlName="equipment" />
           </div>
           <div class="field">
-            <label for="status">manual status</label>
+            <label for="status">{{ i18n.t('manualStatus') }}</label>
             <select id="status" formControlName="status">
-              <option value="free">free</option>
-              <option value="busy">busy</option>
+              <option value="free">{{ i18n.status('free') }}</option>
+              <option value="busy">{{ i18n.status('busy') }}</option>
             </select>
           </div>
 
           <tui-notification *ngIf="message" [appearance]="messageType" class="notice">
-            {{ message }}
+            {{ i18n.message(message) }}
           </tui-notification>
 
           <div class="actions-row">
             <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
-              {{ selectedRoomId ? 'save room' : 'create room' }}
+              {{ selectedRoomId ? i18n.t('saveRoom') : i18n.t('createRoom') }}
             </button>
             <button
               tuiButton
@@ -77,7 +80,7 @@ import { Room } from '../../models';
               [disabled]="!selectedRoomId"
               (click)="deleteSelected()"
             >
-              delete room
+              {{ i18n.t('deleteRoom') }}
             </button>
           </div>
         </form>
@@ -85,7 +88,7 @@ import { Room } from '../../models';
 
       <aside class="aside-info">
         <div class="card">
-          <p class="eyebrow">room catalog</p>
+          <p class="eyebrow">{{ i18n.t('roomCatalog') }}</p>
           <div class="stack">
             <button
               *ngFor="let room of rooms(); trackBy: trackByRoomId"
@@ -94,16 +97,18 @@ import { Room } from '../../models';
               (click)="loadRoom(room.id)"
             >
               <div style="display:flex; justify-content:space-between; gap: 10px;">
-                <strong>{{ room.name }}</strong>
+                <strong>{{ i18n.roomName(room) }}</strong>
                 <span
                   tuiBadge
                   [appearance]="state.roomStatus(room.id) === 'free' ? 'positive' : 'warning'"
                 >
-                  {{ state.roomStatus(room.id) }}
+                  {{ i18n.status(state.roomStatus(room.id)) }}
                 </span>
               </div>
-              <div class="muted">{{ room.capacity }} seats · {{ room.location }}</div>
-              <div>{{ room.equipment.join(', ') }}</div>
+              <div class="muted">
+                {{ i18n.seats(room.capacity) }} · {{ i18n.location(room.location) }}
+              </div>
+              <div>{{ i18n.equipmentList(room.equipment) }}</div>
             </button>
           </div>
         </div>
@@ -113,6 +118,7 @@ import { Room } from '../../models';
 })
 export class AdminComponent {
   readonly state = inject(AppStateService);
+  readonly i18n = inject(I18nService);
   private readonly fb = inject(FormBuilder);
 
   readonly rooms = this.state.rooms;
