@@ -86,8 +86,6 @@ Vercel build настроен в `vercel.json`.
 
 ## Public URL
 
-После подключения Vercel secrets и первого успешного deploy сюда нужно вставить production URL.
-
 ```text
-https://<project>.vercel.app
+https://venue-rouge.vercel.app/
 ```
