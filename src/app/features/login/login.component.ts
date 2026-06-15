@@ -1,10 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { TuiButton } from '@taiga-ui/core';
 import { AppStateService } from '../../core/app-state.service';
 import { I18nService, Language } from '../../core/i18n.service';
+
+type LoginField = 'name' | 'email' | 'password';
+
+function nonBlank(control: AbstractControl): ValidationErrors | null {
+  return String(control.value ?? '').trim() ? null : { required: true };
+}
+
+function personName(control: AbstractControl): ValidationErrors | null {
+  const value = String(control.value ?? '').trim();
+
+  if (!value) {
+    return { required: true };
+  }
+
+  return value.length >= 2 ? null : { shortName: true };
+}
 
 @Component({
   standalone: true,
@@ -33,26 +55,12 @@ import { I18nService, Language } from '../../core/i18n.service';
               </button>
             </div>
           </div>
-          <p class="muted" style="max-width: 28rem; margin-top: 10px;">
-            {{ i18n.t('loginVisualLead') }}
-          </p>
         </div>
 
-        <div class="stack">
-          <div class="room-card">
-            <div class="room-name">{{ i18n.t('filterStepTitle') }}</div>
-            <div class="room-meta">
-              <span>{{ i18n.t('date') }}</span>
-              <span>{{ i18n.t('capacity') }}</span>
-            </div>
-          </div>
-          <div class="room-card">
-            <div class="room-name">{{ i18n.roomName('room 1') }}</div>
-            <div class="room-meta">
-              <span>{{ i18n.equipment('whiteboard') }}</span>
-              <span>{{ i18n.equipment('projector') }}</span>
-            </div>
-          </div>
+        <div class="auth-copy">
+          <p class="eyebrow">{{ i18n.t('meetingRooms') }}</p>
+          <h2>{{ i18n.t('authSlogan') }}</h2>
+          <p>{{ i18n.t('authDescription') }}</p>
         </div>
       </aside>
 
@@ -60,14 +68,12 @@ import { I18nService, Language } from '../../core/i18n.service';
         <div class="card">
           <p class="eyebrow">{{ i18n.t('welcomeBack') }}</p>
           <h1 style="margin: 0 0 8px;">{{ i18n.t('login') }}</h1>
-          <p class="muted" style="margin: 0 0 24px;">
-            {{ i18n.t('loginLead') }}
-          </p>
 
           <form [formGroup]="form" (ngSubmit)="submit()">
             <div class="field">
               <label for="name">{{ i18n.t('name') }}</label>
-              <input id="name" formControlName="name" placeholder="Mila Ivanova" />
+              <input id="name" formControlName="name" placeholder="Анна Петрова" />
+              <p class="field-error" *ngIf="errorFor('name')">{{ errorFor('name') }}</p>
             </div>
 
             <div class="field">
@@ -76,8 +82,9 @@ import { I18nService, Language } from '../../core/i18n.service';
                 id="email"
                 type="email"
                 formControlName="email"
-                placeholder="mila@venue.local"
+                placeholder="name@company.ru"
               />
+              <p class="field-error" *ngIf="errorFor('email')">{{ errorFor('email') }}</p>
             </div>
 
             <div class="field">
@@ -88,9 +95,10 @@ import { I18nService, Language } from '../../core/i18n.service';
                 formControlName="password"
                 placeholder="••••••••"
               />
+              <p class="field-error" *ngIf="errorFor('password')">{{ errorFor('password') }}</p>
             </div>
 
-            <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
+            <button tuiButton class="btn auth-submit" type="submit">
               {{ i18n.t('enterDashboard') }}
             </button>
           </form>
@@ -104,24 +112,62 @@ export class LoginComponent {
   private readonly state = inject(AppStateService);
   private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
+  submitted = false;
 
   readonly form = this.fb.nonNullable.group({
-    name: ['Mila Ivanova', Validators.required],
-    email: ['mila@venue.local', [Validators.required, Validators.email]],
-    password: ['demo-password', Validators.required],
+    name: ['', personName],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', nonBlank],
   });
 
   submit(): void {
+    this.submitted = true;
+
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
     const value = this.form.getRawValue();
-    this.state.login(value.email, value.name || value.email.split('@')[0]);
+    this.state.login(value.email.trim(), value.name.trim() || value.email.split('@')[0]);
     void this.router.navigate(['/rooms']);
   }
 
   setLanguage(language: Language): void {
     this.i18n.setLanguage(language);
+  }
+
+  errorFor(field: LoginField): string {
+    const control = this.form.controls[field];
+
+    if ((!this.submitted && !control.touched) || !control.errors) {
+      return '';
+    }
+
+    if (field === 'name') {
+      if (control.hasError('required')) {
+        return this.i18n.t('nameRequired');
+      }
+
+      if (control.hasError('shortName')) {
+        return this.i18n.t('nameTooShort');
+      }
+    }
+
+    if (field === 'email') {
+      if (control.hasError('required')) {
+        return this.i18n.t('emailRequired');
+      }
+
+      if (control.hasError('email')) {
+        return this.i18n.t('emailInvalid');
+      }
+    }
+
+    if (field === 'password' && control.hasError('required')) {
+      return this.i18n.t('passwordRequired');
+    }
+
+    return '';
   }
 }

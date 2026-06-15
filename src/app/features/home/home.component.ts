@@ -15,21 +15,6 @@ import { RoomCardComponent } from '../../shared/room-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="panel">
-      <div class="workflow-strip" [attr.aria-label]="i18n.t('workflowLabel')">
-        <div class="workflow-step">
-          <strong>1. {{ i18n.t('filterStepTitle') }}</strong>
-          <span>{{ i18n.t('filterStepText') }}</span>
-        </div>
-        <div class="workflow-step">
-          <strong>2. {{ i18n.t('pickStepTitle') }}</strong>
-          <span>{{ i18n.t('pickStepText') }}</span>
-        </div>
-        <div class="workflow-step">
-          <strong>3. {{ i18n.t('manageStepTitle') }}</strong>
-          <span>{{ i18n.t('manageStepText') }}</span>
-        </div>
-      </div>
-
       <form class="filter-strip" [formGroup]="form">
         <div class="field">
           <label for="date">{{ i18n.t('date') }}</label>
@@ -70,10 +55,10 @@ import { RoomCardComponent } from '../../shared/room-card.component';
       >
         <div>
           <p class="eyebrow">{{ i18n.t('availableRooms') }}</p>
-          <h2 style="margin:0;">{{ i18n.t('pickStepTitle') }}</h2>
+          <h2 style="margin:0;">{{ i18n.t('roomCatalog') }}</h2>
         </div>
         <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
-          <div class="user-chip">{{ i18n.roomsFound(rooms().length) }}</div>
+          <div class="result-chip">{{ i18n.roomsFound(rooms().length) }}</div>
           <button tuiButton size="s" type="button" appearance="secondary" (click)="reset()">
             {{ i18n.t('resetFilters') }}
           </button>

@@ -38,7 +38,6 @@ import { I18nService, Language } from '../core/i18n.service';
               EN
             </button>
           </div>
-          <div class="muted">{{ i18n.message(apiMessage()) }}</div>
           <button tuiButton size="s" appearance="secondary" type="button" (click)="logout()">
             {{ i18n.t('logout') }}
           </button>
@@ -52,8 +51,18 @@ import { I18nService, Language } from '../core/i18n.service';
             <h1>{{ title }}</h1>
           </div>
           <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
-            <span tuiBadge appearance="info"> {{ i18n.t('next') }} {{ notificationCount() }} </span>
-            <div class="user-chip">{{ userName() }}</div>
+            <a
+              *ngIf="notificationCount() > 0"
+              tuiBadge
+              appearance="info"
+              routerLink="/bookings"
+            >
+              {{ i18n.t('upcomingNotifications') }}: {{ notificationCount() }}
+            </a>
+            <div class="user-chip">
+              <span class="chip-label">{{ i18n.t('currentUser') }}</span>
+              <span>{{ userName() }}</span>
+            </div>
           </div>
         </header>
 
@@ -70,7 +79,6 @@ export class MainShellComponent {
   readonly userName = computed(() => this.state.user()?.name ?? 'guest');
   readonly isAdmin = computed(() => this.state.user()?.role === 'admin');
   readonly notificationCount = computed(() => this.state.upcomingNotifications().length);
-  readonly apiMessage = this.state.apiMessage;
 
   get title(): string {
     const url = this.router.url;

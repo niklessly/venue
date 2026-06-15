@@ -176,7 +176,8 @@ textarea {
   font-size: clamp(1.4rem, 3vw, 2rem);
 }
 
-.user-chip {
+.user-chip,
+.result-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -186,6 +187,13 @@ textarea {
   font-weight: 700;
 }
 
+.chip-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
 .panel {
   margin-top: 20px;
   background: rgba(255, 255, 255, 0.92);
@@ -193,29 +201,6 @@ textarea {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   padding: 18px;
-}
-
-.workflow-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.workflow-step {
-  min-height: 104px;
-  padding: 14px;
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  background: rgba(255, 240, 181, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 18px;
-}
-
-.workflow-step span {
-  color: var(--muted);
-  line-height: 1.35;
 }
 
 .filter-strip {
@@ -499,10 +484,31 @@ textarea {
   padding: 32px;
   display: grid;
   align-content: space-between;
+  gap: 32px;
 }
 
 .auth-visual .brand {
   font-size: 2.4rem;
+}
+
+.auth-copy {
+  max-width: 560px;
+  align-self: end;
+}
+
+.auth-copy h2 {
+  margin: 0;
+  max-width: 11ch;
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  line-height: 0.95;
+}
+
+.auth-copy p:last-child {
+  max-width: 36rem;
+  margin: 20px 0 0;
+  color: #4d444b;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.5;
 }
 
 .auth-card {
@@ -522,6 +528,24 @@ textarea {
   gap: 14px;
 }
 
+.field-error {
+  margin: 6px 0 0;
+  color: var(--tui-status-negative);
+  font-size: 0.86rem;
+  line-height: 1.25;
+}
+
+.auth-submit {
+  margin-top: 6px;
+  background: var(--accent-yellow) !important;
+  color: #2d2700 !important;
+  box-shadow: 0 12px 24px rgba(255, 212, 59, 0.28);
+}
+
+.auth-submit:hover {
+  background: #ffc928 !important;
+}
+
 .muted {
   color: var(--muted);
 }
@@ -537,6 +561,10 @@ textarea {
   padding: 16px;
   display: grid;
   gap: 8px;
+}
+
+.booking-item--compact {
+  padding: 12px;
 }
 
 @media (max-width: 1100px) {
@@ -559,7 +587,6 @@ textarea {
 
   .rooms-grid,
   .summary-grid,
-  .workflow-strip,
   .filter-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -575,7 +602,6 @@ textarea {
 
   .rooms-grid,
   .summary-grid,
-  .workflow-strip,
   .filter-strip {
     grid-template-columns: 1fr;
   }

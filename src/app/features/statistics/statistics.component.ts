@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TuiProgressBar } from '@taiga-ui/kit';
 import { AppStateService } from '../../core/app-state.service';
 import { I18nService } from '../../core/i18n.service';
-import { Room } from '../../models';
+import { Booking, Room } from '../../models';
 
 @Component({
   standalone: true,
@@ -53,12 +53,21 @@ import { Room } from '../../models';
             <h2 style="margin:0;">{{ i18n.roomName(stats().freeRoom) }}</h2>
           </div>
           <div class="card">
-            <p class="eyebrow">{{ i18n.t('workflowLabel') }}</p>
-            <ul class="muted" style="margin:0; padding-left: 18px; display:grid; gap: 8px;">
-              <li>{{ i18n.t('filterStepText') }}</li>
-              <li>{{ i18n.t('pickStepText') }}</li>
-              <li>{{ i18n.t('manageStepText') }}</li>
-            </ul>
+            <p class="eyebrow">{{ i18n.t('upcomingNotifications') }}</p>
+            <div class="stack" style="gap: 10px;" *ngIf="notifications().length; else noUpcoming">
+              <div
+                class="booking-item booking-item--compact"
+                *ngFor="let booking of notifications(); trackBy: trackByBookingId"
+              >
+                <strong>{{ i18n.title(booking.title) }}</strong>
+                <div class="muted">
+                  {{ booking.date }} · {{ booking.startTime }} · {{ roomName(booking.roomId) }}
+                </div>
+              </div>
+            </div>
+            <ng-template #noUpcoming>
+              <div class="muted">{{ i18n.t('noUpcomingBookings') }}</div>
+            </ng-template>
           </div>
         </div>
       </div>
@@ -71,6 +80,7 @@ export class StatisticsComponent {
 
   readonly rooms = this.state.rooms;
   readonly stats = this.state.statistics;
+  readonly notifications = this.state.upcomingNotifications;
 
   usage(roomId: string): number {
     return this.state
@@ -83,7 +93,15 @@ export class StatisticsComponent {
     return Math.round((this.usage(roomId) / max) * 100);
   }
 
+  roomName(roomId: string): string {
+    return this.i18n.roomName(this.state.roomById(roomId) ?? this.i18n.t('room'));
+  }
+
   trackByRoomId(_: number, room: Room): string {
     return room.id;
+  }
+
+  trackByBookingId(_: number, booking: Booking): string {
+    return booking.id;
   }
 }
