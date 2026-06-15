@@ -5,10 +5,20 @@ import { DEMO_BOOKINGS, DEMO_ROOMS, DEMO_USER } from '../mock-data';
 describe('AppStateService', () => {
   let service: AppStateService;
 
+  const shiftDate = (date: string, days: number): string => {
+    const value = new Date(`${date}T00:00:00`);
+    value.setDate(value.getDate() + days);
+    const year = value.getFullYear();
+    const month = (value.getMonth() + 1).toString().padStart(2, '0');
+    const day = value.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
   const makeDraft = (patch: Partial<BookingDraft> = {}): BookingDraft => ({
     roomId: 'room-4',
     title: 'Test meeting',
-    date: '2026-06-20',
+    date: shiftDate(service.today(), 5),
     startTime: '09:00',
     endTime: '10:00',
     participants: 2,
@@ -64,14 +74,16 @@ describe('AppStateService', () => {
     expect(filtered.every((room) => room.capacity >= 8)).toBeTruthy();
   });
 
-  it('filters by active booking availability', () => {
+  it('filters by selected date and time availability', () => {
     service.setFilters({
-      date: '2026-06-06',
+      date: shiftDate(service.today(), 1),
       time: '10:15',
-      availableOnly: true,
     });
 
     expect(service.filteredRooms().some((room) => room.id === 'room-1')).toBe(false);
+    expect(
+      service.filteredRooms().every((room) => service.roomStatusForFilters(room.id) === 'free'),
+    ).toBe(true);
   });
 
   it('filters by Russian equipment aliases', () => {
@@ -100,7 +112,7 @@ describe('AppStateService', () => {
     const result = service.createBooking(
       makeDraft({
         roomId: 'room-1',
-        date: '2026-06-06',
+        date: shiftDate(service.today(), 1),
         startTime: '10:15',
         endTime: '10:30',
       }),
@@ -110,19 +122,27 @@ describe('AppStateService', () => {
     expect(result.error).toContain('already has an active booking');
   });
 
+  it('createBooking rejects past dates', () => {
+    const result = service.createBooking(makeDraft({ date: shiftDate(service.today(), -1) }));
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('future date');
+  });
+
   it('createBooking succeeds for valid draft and updates rooms/bookings', () => {
     const beforeBookings = service.bookings().length;
-    const result = service.createBooking(makeDraft());
+    const draft = makeDraft();
+    const result = service.createBooking(draft);
     expect(result.ok).toBe(true);
     expect(result.value?.length).toBe(1);
     expect(service.bookings().length).toBe(beforeBookings + 1);
-    expect(service.roomStatus('room-4')).toBe('busy');
+    expect(service.roomStatusAt('room-4', draft.date, '09:30')).toBe('busy');
   });
 
   it('createBooking supports weekly recurring bookings', () => {
     const beforeBookings = service.bookings().length;
     const result = service.createBooking(
-      makeDraft({ recurrence: 'weekly', occurrences: 3, date: '2026-07-01' }),
+      makeDraft({ recurrence: 'weekly', occurrences: 3, date: shiftDate(service.today(), 15) }),
     );
 
     expect(result.ok).toBe(true);
@@ -136,11 +156,16 @@ describe('AppStateService', () => {
 
     const result = service.updateBooking(
       created?.id ?? '',
-      makeDraft({ title: 'Moved', date: '2026-06-21', startTime: '11:00', endTime: '12:00' }),
+      makeDraft({
+        title: 'Moved',
+        date: shiftDate(service.today(), 6),
+        startTime: '11:00',
+        endTime: '12:00',
+      }),
     );
 
     expect(result.ok).toBe(true);
-    expect(service.bookingById(created?.id)?.date).toBe('2026-06-21');
+    expect(service.bookingById(created?.id)?.date).toBe(shiftDate(service.today(), 6));
   });
 
   it('cancelBooking marks booking as cancelled and frees room with no other active bookings', () => {

@@ -1,5 +1,20 @@
 import { Booking, Room, User } from '../models';
 
+const formatLocalDate = (value: Date): string => {
+  const year = value.getFullYear();
+  const month = (value.getMonth() + 1).toString().padStart(2, '0');
+  const day = value.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const dateAfter = (days: number): string => {
+  const value = new Date();
+  value.setDate(value.getDate() + days);
+
+  return formatLocalDate(value);
+};
+
 export const DEMO_ROOMS: Room[] = [
   {
     id: 'room-1',
@@ -59,7 +74,7 @@ export const DEMO_BOOKINGS: Booking[] = [
     userId: 'user-1',
     companyId: 'company-1',
     title: 'Project kickoff',
-    date: '2026-06-06',
+    date: dateAfter(1),
     startTime: '10:00',
     endTime: '10:45',
     participants: 3,
@@ -73,7 +88,7 @@ export const DEMO_BOOKINGS: Booking[] = [
     userId: 'user-1',
     companyId: 'company-1',
     title: 'Design review',
-    date: '2026-06-07',
+    date: dateAfter(2),
     startTime: '14:00',
     endTime: '15:00',
     participants: 5,

@@ -80,6 +80,8 @@ export class RoomDetailsComponent {
 
   readonly roomId = this.route.snapshot.paramMap.get('id') ?? this.state.selectedRoomId();
   readonly room = this.state.roomById(this.roomId) ?? this.state.selectedRoom();
+  readonly dateFromRoute = this.route.snapshot.queryParamMap.get('date') ?? '';
+  readonly timeFromRoute = this.route.snapshot.queryParamMap.get('time') ?? '';
 
   constructor() {
     if (this.room) {
@@ -93,11 +95,19 @@ export class RoomDetailsComponent {
     }
 
     this.state.selectRoom(this.room.id);
-    void this.router.navigate(['/rooms', this.room.id, 'book']);
+    void this.router.navigate(['/rooms', this.room.id, 'book'], {
+      queryParams: this.slotQueryParams(),
+    });
   }
 
   status(): 'free' | 'busy' {
-    return this.room ? this.state.roomStatus(this.room.id) : 'free';
+    if (!this.room) {
+      return 'free';
+    }
+
+    return this.dateFromRoute
+      ? this.state.roomStatusAt(this.room.id, this.dateFromRoute, this.timeFromRoute)
+      : this.state.roomStatus(this.room.id);
   }
 
   activeBookings(): Booking[] {
@@ -106,5 +116,12 @@ export class RoomDetailsComponent {
 
   trackByBookingId(_: number, booking: Booking): string {
     return booking.id;
+  }
+
+  private slotQueryParams(): { date?: string; time?: string } {
+    return {
+      ...(this.dateFromRoute ? { date: this.dateFromRoute } : {}),
+      ...(this.timeFromRoute ? { time: this.timeFromRoute } : {}),
+    };
   }
 }

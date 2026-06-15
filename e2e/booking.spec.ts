@@ -9,6 +9,16 @@ async function login(page: Page, email = 'test@venue.local', name = 'Test User')
   await page.waitForURL('**/rooms');
 }
 
+function dateAfter(days: number): string {
+  const value = new Date();
+  value.setDate(value.getDate() + days);
+  const year = value.getFullYear();
+  const month = (value.getMonth() + 1).toString().padStart(2, '0');
+  const day = value.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
 test('filters rooms by equipment, capacity and availability', async ({ page }) => {
   await login(page);
 
@@ -20,11 +30,12 @@ test('filters rooms by equipment, capacity and availability', async ({ page }) =
   await expect(page.locator('.room-card')).toContainText('зал 4');
 
   await page.getByRole('button', { name: 'сбросить фильтры' }).click();
-  await page.fill('#date', '2026-06-06');
+  await page.fill('#date', dateAfter(1));
   await page.fill('#time', '10:15');
   await page.locator('#capacity').fill('0');
-  await page.locator('label').filter({ hasText: 'только свободные' }).locator('input').check();
   await expect(page.locator('.room-card').filter({ hasText: 'зал 1' })).toHaveCount(0);
+  await expect(page.locator('.room-card').filter({ hasText: 'занят' })).toHaveCount(0);
+  await expect(page.locator('.room-card-free')).toHaveCount(3);
 });
 
 test('creates, edits, cancels and deletes booking', async ({ page }) => {
@@ -36,7 +47,7 @@ test('creates, edits, cancels and deletes booking', async ({ page }) => {
   await page.waitForURL('**/rooms/room-4/book');
 
   await page.fill('#title', 'Playwright booking');
-  await page.fill('#date', '2026-06-22');
+  await page.fill('#date', dateAfter(7));
   await page.fill('#startTime', '10:00');
   await page.fill('#endTime', '10:30');
   await page.fill('#participants', '2');
@@ -75,7 +86,7 @@ test('rejects conflicting booking slot', async ({ page }) => {
 
   await page.goto('/rooms/room-1/book');
   await page.fill('#title', 'Conflict check');
-  await page.fill('#date', '2026-06-06');
+  await page.fill('#date', dateAfter(1));
   await page.fill('#startTime', '10:15');
   await page.fill('#endTime', '10:30');
   await page.fill('#participants', '2');

@@ -18,7 +18,7 @@ import { RoomCardComponent } from '../../shared/room-card.component';
       <form class="filter-strip" [formGroup]="form">
         <div class="field">
           <label for="date">{{ i18n.t('date') }}</label>
-          <input id="date" type="date" formControlName="date" />
+          <input id="date" type="date" formControlName="date" [attr.min]="today" />
         </div>
         <div class="field">
           <label for="time">{{ i18n.t('time') }}</label>
@@ -70,6 +70,7 @@ import { RoomCardComponent } from '../../shared/room-card.component';
           <app-room-card
             *ngFor="let room of rooms(); trackBy: trackByRoomId"
             [room]="room"
+            [status]="roomStatus(room.id)"
             (selected)="openRoom($event)"
           />
         </div>
@@ -92,6 +93,7 @@ export class HomeComponent {
   readonly rooms = this.state.filteredRooms;
   readonly companyRooms = this.state.rooms;
   readonly loading = this.state.loading;
+  readonly today = this.state.today();
 
   readonly form = this.fb.nonNullable.group({
     date: [''],
@@ -119,7 +121,9 @@ export class HomeComponent {
 
   openRoom(roomId: string): void {
     this.state.selectRoom(roomId);
-    void this.router.navigate(['/room-details', roomId]);
+    void this.router.navigate(['/room-details', roomId], {
+      queryParams: this.slotQueryParams(),
+    });
   }
 
   reset(): void {
@@ -136,5 +140,18 @@ export class HomeComponent {
 
   trackByRoomId(_: number, room: Room): string {
     return room.id;
+  }
+
+  roomStatus(roomId: string): Room['status'] {
+    return this.state.roomStatusForFilters(roomId);
+  }
+
+  private slotQueryParams(): { date?: string; time?: string } {
+    const { date, time } = this.form.getRawValue();
+
+    return {
+      ...(date ? { date } : {}),
+      ...(time ? { time } : {}),
+    };
   }
 }

@@ -17,15 +17,21 @@ import { Room } from '../models';
   imports: [CommonModule, TuiBadge],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <button class="room-card" type="button" (click)="selected.emit(room.id)">
+    <button
+      class="room-card"
+      [class.room-card-free]="displayStatus === 'free'"
+      [class.room-card-busy]="displayStatus === 'busy'"
+      type="button"
+      (click)="selected.emit(room.id)"
+    >
       <div>
         <div class="room-name">{{ i18n.roomName(room) }}</div>
         <div class="muted">{{ i18n.location(room.location) }}</div>
       </div>
       <div class="room-meta">
         <span>{{ i18n.seats(room.capacity) }}</span>
-        <span tuiBadge [appearance]="room.status === 'free' ? 'positive' : 'warning'">
-          {{ i18n.status(room.status) }}
+        <span tuiBadge [appearance]="displayStatus === 'free' ? 'positive' : 'warning'">
+          {{ i18n.status(displayStatus) }}
         </span>
       </div>
       <div class="equipment-line">{{ i18n.equipmentList(room.equipment) }}</div>
@@ -36,5 +42,10 @@ import { Room } from '../models';
 export class RoomCardComponent {
   readonly i18n = inject(I18nService);
   @Input({ required: true }) room!: Room;
+  @Input() status: Room['status'] | null = null;
   @Output() readonly selected = new EventEmitter<string>();
+
+  get displayStatus(): Room['status'] {
+    return this.status ?? this.room.status;
+  }
 }

@@ -50,7 +50,7 @@ import { Recurrence } from '../../models';
             <div class="time-grid">
               <div class="field">
                 <label for="date">{{ i18n.t('date') }}</label>
-                <input id="date" type="date" formControlName="date" />
+                <input id="date" type="date" formControlName="date" [attr.min]="minDate" />
               </div>
               <div class="field">
                 <label for="startTime">{{ i18n.t('startTime') }}</label>
@@ -127,6 +127,9 @@ export class BookingComponent {
   readonly bookingIdFromRoute = this.route.snapshot.paramMap.get('bookingId');
   readonly editingBooking = this.state.bookingById(this.bookingIdFromRoute);
   readonly isEditing = Boolean(this.editingBooking);
+  readonly minDate = this.state.today();
+  readonly dateFromRoute = this.route.snapshot.queryParamMap.get('date') ?? '';
+  readonly timeFromRoute = this.route.snapshot.queryParamMap.get('time') ?? '';
   readonly roomIdFromRoute =
     this.editingBooking?.roomId ??
     this.route.snapshot.queryParamMap.get('roomId') ??
@@ -138,9 +141,9 @@ export class BookingComponent {
   readonly form = this.fb.nonNullable.group({
     roomId: [this.roomIdFromRoute],
     title: [this.editingBooking?.title ?? ''],
-    date: [this.editingBooking?.date ?? '2026-06-06', Validators.required],
-    startTime: [this.editingBooking?.startTime ?? '10:00', Validators.required],
-    endTime: [this.editingBooking?.endTime ?? '10:45', Validators.required],
+    date: [this.editingBooking?.date ?? this.initialDate(), Validators.required],
+    startTime: [this.editingBooking?.startTime ?? this.initialStartTime(), Validators.required],
+    endTime: [this.editingBooking?.endTime ?? this.initialEndTime(), Validators.required],
     participants: [
       this.editingBooking?.participants ?? 4,
       [Validators.required, Validators.min(1)],
@@ -234,5 +237,26 @@ export class BookingComponent {
 
   trackByEquipment(_: number, item: string): string {
     return item;
+  }
+
+  private initialDate(): string {
+    return this.dateFromRoute && this.dateFromRoute >= this.minDate
+      ? this.dateFromRoute
+      : this.minDate;
+  }
+
+  private initialStartTime(): string {
+    return this.timeFromRoute || '10:00';
+  }
+
+  private initialEndTime(): string {
+    const [hours, minutes] = this.initialStartTime().split(':').map(Number);
+    const total = Math.min(hours * 60 + minutes + 30, 23 * 60 + 59);
+    const endHours = Math.floor(total / 60)
+      .toString()
+      .padStart(2, '0');
+    const endMinutes = (total % 60).toString().padStart(2, '0');
+
+    return `${endHours}:${endMinutes}`;
   }
 }

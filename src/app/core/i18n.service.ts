@@ -369,6 +369,7 @@ export class I18nService {
           'Booking was not saved.': 'Бронь не сохранена.',
           'Cancel or move active bookings before deleting this room.':
             'Перед удалением отмените или перенесите активные брони.',
+          'Choose today or a future date.': 'Выберите сегодняшнюю или будущую дату.',
           'Choose a valid room before booking.': 'Выберите существующий зал перед бронированием.',
           'Date, start time and end time are required.':
             'Дата, начало и конец встречи обязательны.',

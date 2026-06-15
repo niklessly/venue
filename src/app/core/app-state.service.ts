@@ -66,9 +66,9 @@ export class AppStateService {
             room.location.toLowerCase().includes(query),
         );
       const fitsAvailability =
-        !filters.availableOnly ||
-        !filters.date ||
-        this.isRoomAvailable(room.id, filters.date, filters.time);
+        filters.date || filters.availableOnly
+          ? this.isRoomAvailableForFilters(room.id, filters)
+          : true;
 
       return fitsCapacity && fitsEquipment && fitsAvailability;
     });
@@ -79,7 +79,9 @@ export class AppStateService {
       }
 
       if (filters.sortBy === 'status') {
-        return this.roomStatus(left.id).localeCompare(this.roomStatus(right.id));
+        return this.roomStatusForFilterValues(left.id, filters).localeCompare(
+          this.roomStatusForFilterValues(right.id, filters),
+        );
       }
 
       return left.name.localeCompare(right.name);
@@ -234,11 +236,25 @@ export class AppStateService {
   }
 
   roomStatus(roomId: string): 'free' | 'busy' {
+    const today = this.today();
+    const now = this.currentTime();
     const active = this.bookings().some(
-      (booking) => booking.roomId === roomId && booking.status === 'active',
+      (booking) =>
+        booking.roomId === roomId &&
+        booking.status === 'active' &&
+        booking.date === today &&
+        this.timeWithin(now, booking.startTime, booking.endTime),
     );
 
     return active ? 'busy' : 'free';
+  }
+
+  roomStatusAt(roomId: string, date: string, time = ''): 'free' | 'busy' {
+    return this.isRoomAvailable(roomId, date, time) ? 'free' : 'busy';
+  }
+
+  roomStatusForFilters(roomId: string): 'free' | 'busy' {
+    return this.roomStatusForFilterValues(roomId, this.filters());
   }
 
   isRoomAvailable(roomId: string, date: string, time = ''): boolean {
@@ -266,6 +282,10 @@ export class AppStateService {
     };
 
     return !this.hasConflict(slot);
+  }
+
+  today(): string {
+    return this.formatLocalDate(new Date());
   }
 
   createBooking(draft: BookingDraft): OperationResult<Booking[]> {
@@ -475,6 +495,10 @@ export class AppStateService {
       return 'Date, start time and end time are required.';
     }
 
+    if (draft.date < this.today()) {
+      return 'Choose today or a future date.';
+    }
+
     if (this.toMinutes(draft.startTime) >= this.toMinutes(draft.endTime)) {
       return 'End time must be later than start time.';
     }
@@ -527,13 +551,20 @@ export class AppStateService {
     const value = new Date(`${date}T00:00:00`);
     value.setDate(value.getDate() + (recurrence === 'daily' ? index : index * 7));
 
-    return value.toISOString().slice(0, 10);
+    return this.formatLocalDate(value);
   }
 
   private refreshRoomStatuses(): void {
+    const today = this.today();
+    const now = this.currentTime();
     const activeRoomIds = new Set(
       this.allBookings()
-        .filter((booking) => booking.status === 'active')
+        .filter(
+          (booking) =>
+            booking.status === 'active' &&
+            booking.date === today &&
+            this.timeWithin(now, booking.startTime, booking.endTime),
+        )
         .map((booking) => booking.roomId),
     );
 
@@ -570,8 +601,40 @@ export class AppStateService {
     return `${hours}:${minutes}`;
   }
 
-  private today(): string {
-    return new Date().toISOString().slice(0, 10);
+  private roomStatusForFilterValues(roomId: string, filters: RoomFilters): 'free' | 'busy' {
+    return filters.date
+      ? this.roomStatusAt(roomId, filters.date, filters.time)
+      : this.roomStatus(roomId);
+  }
+
+  private isRoomAvailableForFilters(roomId: string, filters: RoomFilters): boolean {
+    if (filters.date) {
+      return this.isRoomAvailable(roomId, filters.date, filters.time);
+    }
+
+    return !filters.availableOnly || this.roomStatus(roomId) === 'free';
+  }
+
+  private timeWithin(time: string, startTime: string, endTime: string): boolean {
+    const value = this.toMinutes(time);
+
+    return value >= this.toMinutes(startTime) && value < this.toMinutes(endTime);
+  }
+
+  private currentTime(): string {
+    const value = new Date();
+    const hours = value.getHours().toString().padStart(2, '0');
+    const minutes = value.getMinutes().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+  }
+
+  private formatLocalDate(value: Date): string {
+    const year = value.getFullYear();
+    const month = (value.getMonth() + 1).toString().padStart(2, '0');
+    const day = value.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private uuid(): string {

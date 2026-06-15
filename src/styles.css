@@ -250,8 +250,8 @@ textarea {
 }
 
 .room-card {
-  border: 0;
   background: var(--gray-card);
+  border: 1px solid transparent;
   min-height: 150px;
   border-radius: 20px;
   padding: 18px;
@@ -264,6 +264,15 @@ textarea {
     box-shadow 0.2s ease;
   width: 100%;
   height: 100%;
+}
+
+.room-card-free {
+  background: #eef8e8;
+  border-color: rgba(19, 115, 51, 0.28);
+}
+
+.room-card-busy {
+  background: #e8e4df;
 }
 
 .room-card:hover {
