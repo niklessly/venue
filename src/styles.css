@@ -203,6 +203,10 @@ textarea {
   padding: 18px;
 }
 
+.page-section {
+  margin-top: 20px;
+}
+
 .filter-strip {
   padding: 16px;
   background: var(--soft-yellow);
@@ -563,7 +567,7 @@ textarea {
   gap: 8px;
 }
 
-.booking-item--compact {
+.booking-item-compact {
   padding: 12px;
 }
 

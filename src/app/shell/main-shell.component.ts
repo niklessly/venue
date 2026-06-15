@@ -51,12 +51,7 @@ import { I18nService, Language } from '../core/i18n.service';
             <h1>{{ title }}</h1>
           </div>
           <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
-            <a
-              *ngIf="notificationCount() > 0"
-              tuiBadge
-              appearance="info"
-              routerLink="/bookings"
-            >
+            <a *ngIf="notificationCount() > 0" tuiBadge appearance="info" routerLink="/bookings">
               {{ i18n.t('upcomingNotifications') }}: {{ notificationCount() }}
             </a>
             <div class="user-chip">

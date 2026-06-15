@@ -76,7 +76,9 @@ import { RoomCardComponent } from '../../shared/room-card.component';
       </tui-loader>
 
       <ng-template #emptyRooms>
-        <div class="empty-state">{{ i18n.t('noRooms') }}</div>
+        <div class="empty-state">
+          {{ companyRooms().length ? i18n.t('noRooms') : i18n.t('noCompanyRooms') }}
+        </div>
       </ng-template>
     </section>
   `,
@@ -88,6 +90,7 @@ export class HomeComponent {
   readonly i18n = inject(I18nService);
 
   readonly rooms = this.state.filteredRooms;
+  readonly companyRooms = this.state.rooms;
   readonly loading = this.state.loading;
 
   readonly form = this.fb.nonNullable.group({

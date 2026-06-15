@@ -14,7 +14,7 @@ type BookingFilter = 'all' | BookingStatus;
   imports: [CommonModule, RouterLink, TuiBadge, TuiButton, TuiNotification],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="stack">
+    <section class="stack page-section">
       <div class="summary-grid">
         <div class="summary-card">
           <div class="eyebrow">{{ i18n.t('active') }}</div>

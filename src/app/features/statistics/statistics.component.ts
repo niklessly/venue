@@ -10,7 +10,7 @@ import { Booking, Room } from '../../models';
   imports: [CommonModule, TuiProgressBar],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="stack">
+    <section class="stack page-section">
       <div class="summary-grid">
         <div class="summary-card">
           <div class="eyebrow">{{ i18n.t('activeBookings') }}</div>
@@ -22,7 +22,7 @@ import { Booking, Room } from '../../models';
         </div>
         <div class="summary-card">
           <div class="eyebrow">{{ i18n.t('popularRoom') }}</div>
-          <h2 style="margin:0;">{{ i18n.roomName(stats().popularRoom) }}</h2>
+          <h2 style="margin:0;">{{ roomLabel(stats().popularRoom) }}</h2>
         </div>
         <div class="summary-card">
           <div class="eyebrow">{{ i18n.t('utilization') }}</div>
@@ -33,7 +33,7 @@ import { Booking, Room } from '../../models';
       <div class="split-layout">
         <div class="card">
           <p class="eyebrow">{{ i18n.t('roomUsage') }}</p>
-          <div class="stack">
+          <div class="stack" *ngIf="rooms().length; else noRoomsForStats">
             <div
               *ngFor="let room of rooms(); trackBy: trackByRoomId"
               style="display:grid; gap: 8px;"
@@ -45,18 +45,21 @@ import { Booking, Room } from '../../models';
               <progress tuiProgressBar max="100" [value]="bar(room.id)"></progress>
             </div>
           </div>
+          <ng-template #noRoomsForStats>
+            <div class="empty-state">{{ i18n.t('noCompanyRooms') }}</div>
+          </ng-template>
         </div>
 
         <div class="aside-info">
           <div class="card">
             <p class="eyebrow">{{ i18n.t('freeRoom') }}</p>
-            <h2 style="margin:0;">{{ i18n.roomName(stats().freeRoom) }}</h2>
+            <h2 style="margin:0;">{{ roomLabel(stats().freeRoom) }}</h2>
           </div>
           <div class="card">
             <p class="eyebrow">{{ i18n.t('upcomingNotifications') }}</p>
             <div class="stack" style="gap: 10px;" *ngIf="notifications().length; else noUpcoming">
               <div
-                class="booking-item booking-item--compact"
+                class="booking-item booking-item-compact"
                 *ngFor="let booking of notifications(); trackBy: trackByBookingId"
               >
                 <strong>{{ i18n.title(booking.title) }}</strong>
@@ -95,6 +98,10 @@ export class StatisticsComponent {
 
   roomName(roomId: string): string {
     return this.i18n.roomName(this.state.roomById(roomId) ?? this.i18n.t('room'));
+  }
+
+  roomLabel(roomName: string): string {
+    return roomName ? this.i18n.roomName(roomName) : this.i18n.t('noRoomsShort');
   }
 
   trackByRoomId(_: number, room: Room): string {

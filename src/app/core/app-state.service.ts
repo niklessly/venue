@@ -114,11 +114,11 @@ export class AppStateService {
       return { room, count };
     });
     const topRoom =
-      [...roomUsage].sort((left, right) => right.count - left.count)[0]?.room.name ?? 'room 1';
+      [...roomUsage].sort((left, right) => right.count - left.count)[0]?.room.name ?? '';
     const freeRoom =
       this.rooms().find((room) => this.roomStatus(room.id) === 'free')?.name ??
       this.rooms()[0]?.name ??
-      'room';
+      '';
     const utilization = this.rooms().length
       ? Math.round((activeBookings.length / this.rooms().length) * 25)
       : 0;
