@@ -46,6 +46,7 @@ Mock API: `http://localhost:3000`
 - Сотрудник: `mila@venue.local`
 - Администратор: любой email с `admin`, например `admin@venue.local`
 - Пользователь другой компании: `partner@venue.local`
+- Любой другой email создает demo-сотрудника первой компании
 
 Пароль в прототипе любой непустой, например `demo-password`.
 

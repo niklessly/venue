@@ -11,7 +11,7 @@ import {
   RoomFilters,
   User,
 } from '../models';
-import { DEMO_BOOKINGS, DEMO_ROOMS, DEMO_USER } from './mock-data';
+import { DEMO_BOOKINGS, DEMO_PARTNER_USER, DEMO_ROOMS, DEMO_USER } from './mock-data';
 import { VenueApiService } from './venue-api.service';
 
 const STORAGE_KEY = 'venue-session';
@@ -25,7 +25,7 @@ export class AppStateService {
   readonly apiReady = signal(false);
   readonly apiMessage = signal('Local demo data is active until mock API responds.');
 
-  private readonly allUsers = signal<User[]>([DEMO_USER]);
+  private readonly allUsers = signal<User[]>([DEMO_USER, DEMO_PARTNER_USER]);
   private readonly allRooms = signal<Room[]>(DEMO_ROOMS);
   private readonly allBookings = signal<Booking[]>(DEMO_BOOKINGS);
 

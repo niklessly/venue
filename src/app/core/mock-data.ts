@@ -56,6 +56,16 @@ export const DEMO_ROOMS: Room[] = [
     location: 'floor 3, south wing',
     status: 'free',
   },
+  {
+    id: 'room-5',
+    companyId: 'company-2',
+    name: 'room 5',
+    capacity: 12,
+    equipment: ['projector', 'video conference'],
+    description: 'Room for another company, used to verify data separation.',
+    location: 'floor 4, partner office',
+    status: 'free',
+  },
 ];
 
 export const DEMO_USER: User = {
@@ -65,6 +75,15 @@ export const DEMO_USER: User = {
   email: 'mila@venue.local',
   role: 'employee',
   token: 'demo-token',
+};
+
+export const DEMO_PARTNER_USER: User = {
+  id: 'user-2',
+  companyId: 'company-2',
+  name: 'Partner User',
+  email: 'partner@venue.local',
+  role: 'employee',
+  token: 'partner-token',
 };
 
 export const DEMO_BOOKINGS: Booking[] = [
@@ -93,6 +112,20 @@ export const DEMO_BOOKINGS: Booking[] = [
     endTime: '15:00',
     participants: 5,
     equipment: ['video conference', 'whiteboard'],
+    status: 'active',
+    recurrence: 'none',
+  },
+  {
+    id: 'booking-3',
+    roomId: 'room-5',
+    userId: 'user-2',
+    companyId: 'company-2',
+    title: 'Partner planning',
+    date: dateAfter(3),
+    startTime: '11:00',
+    endTime: '12:00',
+    participants: 6,
+    equipment: ['projector'],
     status: 'active',
     recurrence: 'none',
   },

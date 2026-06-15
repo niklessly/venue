@@ -53,8 +53,12 @@ describe('AppStateService', () => {
     const user = service.user();
     expect(user).toBeTruthy();
     expect(user?.email).toBe(DEMO_USER.email);
-    expect(service.rooms().length).toBe(DEMO_ROOMS.length);
-    expect(service.bookings().length).toBe(DEMO_BOOKINGS.length);
+    expect(service.rooms().length).toBe(
+      DEMO_ROOMS.filter((room) => room.companyId === DEMO_USER.companyId).length,
+    );
+    expect(service.bookings().length).toBe(
+      DEMO_BOOKINGS.filter((booking) => booking.companyId === DEMO_USER.companyId).length,
+    );
   });
 
   it('login sets user and logout clears it', () => {

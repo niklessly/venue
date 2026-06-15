@@ -9,7 +9,7 @@ const RU = {
   active: 'активные',
   activeBookings: 'активные бронирования',
   activeSchedule: 'расписание зала',
-  adminPanel: 'админка',
+  adminPanel: 'управление залами',
   all: 'все',
   apiConnected: 'Mock API подключен.',
   apiFallback: 'Mock API не запущен. Используются демо-данные.',
@@ -106,7 +106,7 @@ const EN: Record<TranslationKey, string> = {
   active: 'active',
   activeBookings: 'active bookings',
   activeSchedule: 'active schedule',
-  adminPanel: 'admin panel',
+  adminPanel: 'room management',
   all: 'all',
   apiConnected: 'Mock API connected.',
   apiFallback: 'Mock API is offline. Local demo data is used.',
@@ -215,6 +215,7 @@ const LOCATION_RU: Record<string, string> = {
   'floor 2, north wing': '2 этаж, северное крыло',
   'floor 3, west wing': '3 этаж, западное крыло',
   'floor 3, south wing': '3 этаж, южное крыло',
+  'floor 4, partner office': '4 этаж, офис второй компании',
   'floor 5': '5 этаж',
 };
 
@@ -224,12 +225,15 @@ const DESCRIPTION_RU: Record<string, string> = {
   'Good for team reviews and hybrid meetings.': 'Удобен для командных ревью и гибридных встреч.',
   'A slightly larger room for planning sessions.': 'Зал побольше для планирования и обсуждений.',
   'Largest room in the office for workshops.': 'Самый большой зал для воркшопов и презентаций.',
+  'Room for another company, used to verify data separation.':
+    'Зал второй компании для проверки разделения данных.',
   'quiet room for focused work': 'тихий зал для сфокусированной работы',
 };
 
 const TITLE_RU: Record<string, string> = {
   'Project kickoff': 'Старт проекта',
   'Design review': 'Дизайн-ревью',
+  'Partner planning': 'Планирование второй компании',
 };
 
 @Injectable({ providedIn: 'root' })
