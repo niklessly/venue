@@ -231,6 +231,36 @@ describe('AppStateService', () => {
     expect(typeof stats.utilization).toBe('number');
   });
 
+  it('statistics utilization measures booked hours against weekly capacity of all rooms', () => {
+    service.bookings().forEach((booking) => {
+      service.deleteBooking(booking.id);
+    });
+
+    expect(
+      service.createBooking(
+        makeDraft({
+          roomId: 'room-1',
+          date: service.today(),
+          startTime: '09:00',
+          endTime: '17:00',
+        }),
+      ).ok,
+    ).toBe(true);
+
+    expect(
+      service.createBooking(
+        makeDraft({
+          roomId: 'room-4',
+          date: service.today(),
+          startTime: '13:00',
+          endTime: '17:00',
+        }),
+      ).ok,
+    ).toBe(true);
+
+    expect(service.statistics().utilization).toBe(8);
+  });
+
   it('currentUserBookings includes prepared demo bookings for the current company', () => {
     service.login('veronika@example.com', 'Veronika');
 

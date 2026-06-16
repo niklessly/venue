@@ -16,6 +16,7 @@ import { VenueApiService } from './venue-api.service';
 
 const STORAGE_KEY = 'venue-session';
 const MAX_RECURRENCES = 12;
+const WORKING_WEEK_HOURS_PER_ROOM = 40;
 
 @Injectable({ providedIn: 'root' })
 export class AppStateService {
@@ -126,8 +127,12 @@ export class AppStateService {
       this.rooms().find((room) => this.roomStatus(room.id) === 'free')?.name ??
       this.rooms()[0]?.name ??
       '';
-    const utilization = this.rooms().length
-      ? Math.round((activeBookings.length / this.rooms().length) * 25)
+    const occupiedMinutes = activeBookings
+      .filter((booking) => this.isInCurrentWorkWeek(booking.date))
+      .reduce((total, booking) => total + this.bookingDurationMinutes(booking), 0);
+    const benchmarkMinutes = this.rooms().length * WORKING_WEEK_HOURS_PER_ROOM * 60;
+    const utilization = benchmarkMinutes
+      ? Math.round((occupiedMinutes / benchmarkMinutes) * 100)
       : 0;
 
     return {
@@ -597,6 +602,32 @@ export class AppStateService {
     const minutes = (total % 60).toString().padStart(2, '0');
 
     return `${hours}:${minutes}`;
+  }
+
+  private bookingDurationMinutes(booking: Pick<Booking, 'startTime' | 'endTime'>): number {
+    return Math.max(this.toMinutes(booking.endTime) - this.toMinutes(booking.startTime), 0);
+  }
+
+  private isInCurrentWorkWeek(date: string): boolean {
+    const { start, end } = this.currentWorkWeekRange();
+
+    return date >= start && date <= end;
+  }
+
+  private currentWorkWeekRange(): { start: string; end: string } {
+    const value = new Date();
+    const day = value.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    const monday = new Date(value);
+    monday.setDate(value.getDate() + mondayOffset);
+
+    const friday = new Date(monday);
+    friday.setDate(monday.getDate() + 4);
+
+    return {
+      start: this.formatLocalDate(monday),
+      end: this.formatLocalDate(friday),
+    };
   }
 
   private roomStatusForFilterValues(roomId: string, filters: RoomFilters): 'free' | 'busy' {

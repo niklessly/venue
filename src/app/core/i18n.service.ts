@@ -96,7 +96,7 @@ const RU = {
   today: 'сегодня',
   upcomingNotifications: 'ближайшие брони',
   upcomingRooms: 'задействованные залы',
-  utilization: 'загрузка',
+  utilization: 'загрузка в неделю',
   welcomeBack: 'добро пожаловать',
 } as const;
 
@@ -193,7 +193,7 @@ const EN: Record<TranslationKey, string> = {
   today: 'today',
   upcomingNotifications: 'upcoming bookings',
   upcomingRooms: 'upcoming rooms',
-  utilization: 'utilization',
+  utilization: 'weekly utilization',
   welcomeBack: 'welcome back',
 };
 
