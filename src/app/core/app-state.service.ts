@@ -66,7 +66,7 @@ export class AppStateService {
             room.location.toLowerCase().includes(query),
         );
       const fitsAvailability =
-        filters.date || filters.availableOnly
+        filters.time || filters.availableOnly
           ? this.isRoomAvailableForFilters(room.id, filters)
           : true;
 
@@ -94,7 +94,12 @@ export class AppStateService {
       return [];
     }
 
-    return this.bookings().filter((booking) => booking.userId === user.id);
+    const demoOwnerId = this.demoBookingOwnerId(user.companyId);
+
+    return this.bookings().filter(
+      (booking) =>
+        booking.userId === user.id || Boolean(demoOwnerId && booking.userId === demoOwnerId),
+    );
   });
 
   readonly upcomingNotifications = computed(() => {
@@ -258,15 +263,8 @@ export class AppStateService {
   }
 
   isRoomAvailable(roomId: string, date: string, time = ''): boolean {
-    if (!date) {
+    if (!date || !time) {
       return true;
-    }
-
-    if (!time) {
-      return !this.bookings().some(
-        (booking) =>
-          booking.roomId === roomId && booking.date === date && booking.status === 'active',
-      );
     }
 
     const slot: BookingDraft = {
@@ -602,13 +600,13 @@ export class AppStateService {
   }
 
   private roomStatusForFilterValues(roomId: string, filters: RoomFilters): 'free' | 'busy' {
-    return filters.date
+    return filters.date && filters.time
       ? this.roomStatusAt(roomId, filters.date, filters.time)
       : this.roomStatus(roomId);
   }
 
   private isRoomAvailableForFilters(roomId: string, filters: RoomFilters): boolean {
-    if (filters.date) {
+    if (filters.date && filters.time) {
       return this.isRoomAvailable(roomId, filters.date, filters.time);
     }
 
@@ -635,6 +633,10 @@ export class AppStateService {
     const day = value.getDate().toString().padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+  }
+
+  private demoBookingOwnerId(companyId: string): string {
+    return [DEMO_USER, DEMO_PARTNER_USER].find((user) => user.companyId === companyId)?.id ?? '';
   }
 
   private uuid(): string {

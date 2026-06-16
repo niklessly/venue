@@ -28,7 +28,7 @@ import { Room } from '../../models';
 
         <div class="field">
           <label for="roomId">{{ i18n.t('room') }}</label>
-          <select id="roomId" [value]="selectedRoomId ?? ''" (change)="pickRoom($event)">
+          <select id="roomId" [formControl]="roomPicker" (change)="pickRoom($event)">
             <option value="">{{ i18n.t('newRoom') }}</option>
             <option *ngFor="let room of rooms(); trackBy: trackByRoomId" [value]="room.id">
               {{ i18n.roomName(room) }}
@@ -125,6 +125,7 @@ export class AdminComponent {
   selectedRoomId: string | null = this.rooms()[0]?.id ?? null;
   message = '';
   messageType: 'positive' | 'negative' = 'positive';
+  readonly roomPicker = this.fb.nonNullable.control(this.selectedRoomId ?? '');
 
   readonly form = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -153,6 +154,7 @@ export class AdminComponent {
 
   newRoom(): void {
     this.selectedRoomId = null;
+    this.roomPicker.setValue('', { emitEvent: false });
     this.message = '';
     this.form.reset({
       name: '',
@@ -175,6 +177,7 @@ export class AdminComponent {
     }
 
     this.selectedRoomId = roomId;
+    this.roomPicker.setValue(roomId, { emitEvent: false });
     if (clearMessage) {
       this.message = '';
     }
@@ -202,6 +205,7 @@ export class AdminComponent {
 
     const created = !this.selectedRoomId;
     this.selectedRoomId = result.value?.id ?? this.selectedRoomId;
+    this.roomPicker.setValue(this.selectedRoomId ?? '', { emitEvent: false });
     this.messageType = 'positive';
     this.message = created ? 'Room created.' : 'Room saved.';
   }

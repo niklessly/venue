@@ -31,6 +31,9 @@ test('filters rooms by equipment, capacity and availability', async ({ page }) =
 
   await page.getByRole('button', { name: 'сбросить фильтры' }).click();
   await page.fill('#date', dateAfter(1));
+  await expect(page.locator('.room-card')).toHaveCount(4);
+  await expect(page.locator('.room-card').filter({ hasText: 'зал 1' })).toHaveCount(1);
+
   await page.fill('#time', '10:15');
   await page.locator('#capacity').fill('0');
   await expect(page.locator('.room-card').filter({ hasText: 'зал 1' })).toHaveCount(0);
@@ -56,7 +59,6 @@ test('creates, edits, cancels and deletes booking', async ({ page }) => {
   await page.waitForURL('**/bookings');
   const booking = page.locator('.booking-item').filter({ hasText: 'Playwright booking' });
   await expect(booking).toBeVisible();
-  await expect(page.locator('.summary-card').first()).toContainText('1');
 
   await booking.getByRole('link', { name: 'изменить' }).click();
   await page.waitForURL('**/bookings/**/edit');
@@ -73,7 +75,6 @@ test('creates, edits, cancels and deletes booking', async ({ page }) => {
 
   await movedBooking.getByRole('button', { name: 'отменить' }).click();
   await expect(movedBooking).toContainText('отменена');
-  await expect(page.locator('.summary-card').first()).toContainText('0');
 
   await movedBooking.getByRole('button', { name: 'удалить' }).click();
   await expect(

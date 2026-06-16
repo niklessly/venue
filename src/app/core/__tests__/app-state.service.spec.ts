@@ -78,6 +78,13 @@ describe('AppStateService', () => {
     expect(filtered.every((room) => room.capacity >= 8)).toBeTruthy();
   });
 
+  it('keeps rooms visible when only date is selected', () => {
+    service.setFilters({ date: shiftDate(service.today(), 1), time: '' });
+
+    expect(service.filteredRooms()).toHaveLength(service.rooms().length);
+    expect(service.isRoomAvailable('room-1', shiftDate(service.today(), 1))).toBe(true);
+  });
+
   it('filters by selected date and time availability', () => {
     service.setFilters({
       date: shiftDate(service.today(), 1),
@@ -224,10 +231,12 @@ describe('AppStateService', () => {
     expect(typeof stats.utilization).toBe('number');
   });
 
-  it('currentUserBookings returns only bookings for current user', () => {
+  it('currentUserBookings includes prepared demo bookings for the current company', () => {
+    service.login('veronika@example.com', 'Veronika');
+
     const current = service.currentUserBookings();
-    const all = service.bookings();
-    expect(current.every((booking) => booking.userId === service.user()?.id)).toBeTruthy();
-    expect(current.length).toBeLessThanOrEqual(all.length);
+    expect(current.some((booking) => booking.id === 'booking-1')).toBe(true);
+    expect(current.some((booking) => booking.id === 'booking-2')).toBe(true);
+    expect(current.every((booking) => booking.companyId === service.user()?.companyId)).toBe(true);
   });
 });
