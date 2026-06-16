@@ -40,14 +40,17 @@ import { Room } from '../../models';
           <div class="field">
             <label for="name">{{ i18n.t('name') }}</label>
             <input id="name" formControlName="name" />
+            <p class="field-error" *ngIf="errorFor('name')">{{ errorFor('name') }}</p>
           </div>
           <div class="field">
             <label for="capacity">{{ i18n.t('capacity') }}</label>
             <input id="capacity" type="number" min="1" formControlName="capacity" />
+            <p class="field-error" *ngIf="errorFor('capacity')">{{ errorFor('capacity') }}</p>
           </div>
           <div class="field">
             <label for="location">{{ i18n.t('location') }}</label>
             <input id="location" formControlName="location" />
+            <p class="field-error" *ngIf="errorFor('location')">{{ errorFor('location') }}</p>
           </div>
           <div class="field">
             <label for="description">{{ i18n.t('description') }}</label>
@@ -70,7 +73,7 @@ import { Room } from '../../models';
           </tui-notification>
 
           <div class="actions-row">
-            <button tuiButton class="btn" type="submit" [disabled]="form.invalid">
+            <button tuiButton class="btn" type="submit">
               {{ selectedRoomId ? i18n.t('saveRoom') : i18n.t('createRoom') }}
             </button>
             <button
@@ -125,6 +128,7 @@ export class AdminComponent {
   selectedRoomId: string | null = this.rooms()[0]?.id ?? null;
   message = '';
   messageType: 'positive' | 'negative' = 'positive';
+  submitted = false;
   readonly roomPicker = this.fb.nonNullable.control(this.selectedRoomId ?? '');
 
   readonly form = this.fb.nonNullable.group({
@@ -156,6 +160,7 @@ export class AdminComponent {
     this.selectedRoomId = null;
     this.roomPicker.setValue('', { emitEvent: false });
     this.message = '';
+    this.submitted = false;
     this.form.reset({
       name: '',
       capacity: 4,
@@ -180,6 +185,7 @@ export class AdminComponent {
     this.roomPicker.setValue(roomId, { emitEvent: false });
     if (clearMessage) {
       this.message = '';
+      this.submitted = false;
     }
     this.form.setValue({
       name: room.name,
@@ -192,6 +198,15 @@ export class AdminComponent {
   }
 
   save(): void {
+    this.submitted = true;
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.messageType = 'negative';
+      this.message = 'please fill all required fields';
+      return;
+    }
+
     const draft = this.formDraft();
     const result = this.selectedRoomId
       ? this.state.updateRoom(this.selectedRoomId, draft)
@@ -208,6 +223,7 @@ export class AdminComponent {
     this.roomPicker.setValue(this.selectedRoomId ?? '', { emitEvent: false });
     this.messageType = 'positive';
     this.message = created ? 'Room created.' : 'Room saved.';
+    this.submitted = false;
   }
 
   deleteSelected(): void {
@@ -236,6 +252,27 @@ export class AdminComponent {
 
   trackByRoomId(_: number, room: Room): string {
     return room.id;
+  }
+
+  errorFor(field: 'capacity' | 'location' | 'name'): string {
+    const control = this.form.controls[field];
+    if (!(this.submitted || control.touched) || !control.errors) {
+      return '';
+    }
+
+    if (field === 'name' && control.hasError('required')) {
+      return this.i18n.message('Room name is required.');
+    }
+
+    if (field === 'location' && control.hasError('required')) {
+      return this.i18n.message('Room location is required.');
+    }
+
+    if (field === 'capacity' && (control.hasError('required') || control.hasError('min'))) {
+      return this.i18n.message('Room capacity must be at least 1.');
+    }
+
+    return '';
   }
 
   private formDraft() {

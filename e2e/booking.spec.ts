@@ -102,6 +102,13 @@ test('admin creates and deletes room', async ({ page }) => {
 
   await page.goto('/admin');
   await page.getByRole('button', { name: 'новый зал' }).click();
+  await page.getByRole('button', { name: 'создать зал' }).click();
+  await expect(page.getByText('Укажите название зала.')).toBeVisible();
+  await expect(page.getByText('Укажите локацию зала.')).toBeVisible();
+  await page.fill('#capacity', '0');
+  await page.getByRole('button', { name: 'создать зал' }).click();
+  await expect(page.getByText('Вместимость зала должна быть не меньше 1.')).toBeVisible();
+
   await page.fill('#name', 'focus room');
   await page.fill('#capacity', '3');
   await page.fill('#location', 'floor 5');
